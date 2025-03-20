@@ -2416,7 +2416,7 @@ void c_ser_player::about_ser_player()
 
     msgBox.setText("<b><big>" + tr("SER Player") + "</big> " APP_VERSION_STRING " (" + build_type_string + ")</b>");
     QString informative_text = tr("A video player and processing utility for SER files.");
-    informative_text += "<qt><a href=\"http://sites.google.com/site/astropipp/\">http://sites.google.com/site/astropipp/</a><br>";
+//    informative_text += "<qt><a href=\"http://sites.google.com/site/astropipp/\">http://sites.google.com/site/astropipp/</a><br>";
     informative_text += "Copyright (c) 2015-2020 Chris Garry<br>";
     informative_text += "Copyright (c) 2025 Cyril Richard";
 
