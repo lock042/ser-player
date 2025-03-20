@@ -2,7 +2,7 @@
 
 # Helper file for generating a SER Player Linux AppImage
 # ------------------------------------------------------
-# This file is designed for to be used on Ubuntu 14.04
+# This file is designed for to be used on Ubuntu 22.04 (Jammy)
 # Either 64-bit or 32-bit depending on the version of
 # AppImage required.
 #
@@ -18,7 +18,7 @@ fi
 
 # Clean up any previous attempts to build an AppImage
 rm -rf bin build appdir
-rm *.AppImage
+rm -f *.AppImage
 
 # Ensure the system is up to date
 sudo apt-get update -qq
@@ -28,33 +28,31 @@ sudo apt-get upgrade
 sudo apt-get -y install build-essential libgl1-mesa-dev libpng-dev
 
 # Get the correct version of Qt
-
-sudo add-apt-repository ppa:beineri/opt-qt-5.10.1-trusty -y
+sudo add-apt-repository ppa:beineri/opt-qt-6.6.0-jammy -y
 sudo apt-get update -qq
-sudo apt-get -y install qt510base
-source /opt/qt*/bin/qt*-env.sh
+sudo apt-get -y install qt6-base-dev qt6-base-dev-tools
+
+# Configure Qt6 environment
+export QT_SELECT=qt6
 
 # Build the SER Player binary
-qmake CONFIG+=release BUILD_FOR_APPIMAGE=
+qmake6 CONFIG+=release BUILD_FOR_APPIMAGE=
 make -j$(nproc)
 ls -l bin/
 ldd bin/ser-player
-make INSTALL_ROOT=appdir -j$(nproc) install ; find appdir/
+make INSTALL_ROOT=appdir -j$(nproc) install
+find appdir/
 
-# Checkout and build linuxdeployqt if required
-type linuxdeployqt >/dev/null 2>&1 || {
-  git clone https://github.com/probonopd/linuxdeployqt.git
-  ( cd linuxdeployqt/ && qmake && make && sudo make install )
-  
-  # Clean up
-  rm -rf linuxdeployqt
-}
+# Download linuxdeploy and plugin for Qt6 instead of building linuxdeployqt
+wget -c "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+wget -c "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
+chmod a+x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-qt-x86_64.AppImage
 
 # Get and build patchelf if required
 type patchelf >/dev/null 2>&1 || {
   wget https://nixos.org/releases/patchelf/patchelf-0.9/patchelf-0.9.tar.bz2
   tar xf patchelf-0.9.tar.bz2
-  ( cd patchelf-0.9/ && ./configure  && make && sudo make install )
+  ( cd patchelf-0.9/ && ./configure && make && sudo make install )
   
   # Clean up
   rm -rf patchelf-0.9
@@ -65,14 +63,47 @@ type patchelf >/dev/null 2>&1 || {
 wget -c -nv "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-$MACHINE_ARCH.AppImage"
 chmod a+x "appimagetool-$MACHINE_ARCH.AppImage"
 
-# Use linuxdeployqt to generate a populated appdir
-unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-source export_app_version.sh
+# Load version information
+if [ -f export_app_version.sh ]; then
+  source export_app_version.sh
+else
+  VERSION="unknown"
+fi
 
-linuxdeployqt appdir/usr/share/applications/*.desktop -bundle-non-qt-libs -no-translations
+# Make sure the desktop file exists
+if [ ! -f appdir/usr/share/applications/com.google.sites.ser-player.desktop ]; then
+  mkdir -p appdir/usr/share/applications/
+  cat > appdir/usr/share/applications/com.google.sites.ser-player.desktop <<EOL
+[Desktop Entry]
+Type=Application
+Name=SER Player
+Comment=SER Player is an open source video player for playing SER files
+Exec=ser-player %F
+Icon=ser-player
+Terminal=false
+Categories=Graphics;2DGraphics;Viewer;
+MimeType=application/x-ser;
+EOL
+fi
 
-# Remove AppRun symbolic link created by appimagetool in appdir
-rm -f appdir/AppRun
+# Find the exact path to the desktop file
+DESKTOP_FILE=$(find appdir/usr/share/applications/ -name "*.desktop" | head -n 1)
+echo "Using desktop file: $DESKTOP_FILE"
+
+# Configure Qt6 paths for linuxdeploy
+export QT_PLUGIN_PATH=/usr/lib/x86_64-linux-gnu/qt6/plugins/
+
+# Use linuxdeploy to generate a populated appdir
+unset QTDIR; unset LD_LIBRARY_PATH
+export QMAKE=/usr/lib/qt6/bin/qmake
+
+# Run linuxdeploy with Qt plugin and explicit desktop file
+./linuxdeploy-x86_64.AppImage --appdir=appdir --plugin=qt --executable=bin/ser-player --desktop-file="$DESKTOP_FILE"
+
+# Remove AppRun symbolic link created by linuxdeploy in appdir if it exists
+if [ -L appdir/AppRun ]; then
+  rm -f appdir/AppRun
+fi
 
 # Create a script to replace the deleted AppRun link
 cat > appdir/AppRun <<EOL
@@ -88,7 +119,7 @@ if [[ \$1 == --install ]]; then
     cat "\$APPDIR/usr/share/applications/com.google.sites.ser-player.desktop" | sed -e "s:Exec=ser-player \%F:Exec=\$HOME/.local/bin/ser-player \%F:" > "\$HOME/.local/share/applications/com.google.sites.ser-player.desktop"
 
     # Copy the actual AppImage into $HOME/.local/bin/
-    mkdir -p "$HOME/.local/bin/"
+    mkdir -p "\$HOME/.local/bin/"
     cp \$APPIMAGE "\$HOME/.local/bin/ser-player"
 
     # Update icon cache
@@ -128,6 +159,26 @@ else
 fi
 EOL
 chmod a+x appdir/AppRun
+
+# Make sure all directories exist
+mkdir -p appdir/usr/bin/
+mkdir -p appdir/usr/share/mime/packages/
+
+# Copy the binary if it's not already there
+if [ ! -f appdir/usr/bin/ser-player ]; then
+  cp bin/ser-player appdir/usr/bin/
+fi
+
+# Ensure icon files are present
+mkdir -p appdir/usr/share/icons/hicolor/256x256/apps/
+if [ -f platform-specific/linux/icons/256x256/ser-player.png ]; then
+  cp platform-specific/linux/icons/256x256/ser-player.png appdir/usr/share/icons/hicolor/256x256/apps/
+fi
+
+# Ensure mime type file is present 
+if [ -f platform-specific/linux/ser-player.xml ]; then
+  cp platform-specific/linux/ser-player.xml appdir/usr/share/mime/packages/
+fi
 
 # Use appimagetool to create the final AppImage from the appdir
 ./appimagetool-$MACHINE_ARCH.AppImage -v appdir

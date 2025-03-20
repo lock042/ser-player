@@ -32,9 +32,9 @@
 # ---------------------------------------------------------------------
 
 
-#BUILD_FOR_REPOSITORY=1
+BUILD_FOR_REPOSITORY=1
 defined(BUILD_FOR_REPOSITORY, var) {
-    APP_VERSION="v1.7.3"
+    APP_VERSION="v1.8.0"
     export(APP_VERSION)
 }
 
