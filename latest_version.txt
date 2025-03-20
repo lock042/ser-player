@@ -1,13 +1,8 @@
-v1.7.2
-Bug Fixes:
- * Fixed issue with colour balance estimation when non-default bayer pattern is used for debayering.
+v1.8.0: 20/03/2025
 Enhancements:
- * Added ability to disconnect playback controls to allow a greater zoom.
- * Added support for NeuQuant neural-net quantisation algorithm for improved colour GIF generation.
- * Updated save frames dialog to make it more user friendly.
- * Added Polish language translation.
- * TIFF image writing made faster, plus support for 16-bit data and true monochrome added (TIFF code from PIPP used).
- * PNG image writing made faster, plus support for 16-bit data and true monochrome added (libpng now used).
- * Changed image background to very dark grey.
- * Added Polish language translation.
- * Added Russian language translation.
+ * Updated the application to use Qt6, ensuring compatibility with modern operating systems.
+ * Migrated the project to a new maintainer, Cyril Richard, who continues development.
+Technical Updates:
+ * Modernized C++ code to use C++17 standard.
+ * Updated AppImage generation scripts for better Linux compatibility.
+ * Resolved various Qt deprecated API issues.

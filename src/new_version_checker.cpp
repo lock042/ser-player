@@ -41,7 +41,7 @@ void c_new_version_checker::check()
     uint current_time = QDateTime::currentDateTime().toSecsSinceEpoch();
     if (current_time > c_persistent_data::m_last_ver_check_time + secs_between_update_checks) {
         net_access_manager->get(QNetworkRequest(
-            QUrl("https://raw.githubusercontent.com/cgarry/ser-player/master/latest_version.txt")));
+            QUrl("https://raw.githubusercontent.com/lock042/ser-player/master/latest_version.txt")));
     }
 }
 
