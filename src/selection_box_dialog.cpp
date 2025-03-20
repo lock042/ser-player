@@ -17,7 +17,6 @@
 
 #include <QDebug>
 
-#include <Qt>
 #include <QComboBox>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -25,18 +24,18 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QSpinBox>
-#include <QVariant>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <Qt>
 
-#include "selection_box_dialog.h"
 #include "persistent_data.h"
-
+#include "selection_box_dialog.h"
 
 c_selection_box_dialog::c_selection_box_dialog(QWidget *parent)
-    : QDialog(parent),
-      m_width(10),
-      m_height(10),
-      m_spinbox_values_valid(true)
+    : QDialog(parent)
+    , m_width(10)
+    , m_height(10)
+    , m_spinbox_values_valid(true)
 {
     setWindowTitle(tr("Selection Box"));
     QDialog::setWindowFlags((QDialog::windowFlags() & ~Qt::WindowContextHelpButtonHint));
@@ -62,7 +61,7 @@ c_selection_box_dialog::c_selection_box_dialog(QWidget *parent)
     connect(mp_height_SpinBox, SIGNAL(valueChanged(int)), this, SLOT(spinbox_changed_slot()));
 
     QGridLayout *area_select_GLayout = new QGridLayout;
-    area_select_GLayout->setMargin(0);
+    area_select_GLayout->setContentsMargins(0, 0, 0, 0);
     area_select_GLayout->setHorizontalSpacing(10);
     area_select_GLayout->setVerticalSpacing(8);
     area_select_GLayout->addWidget(new QLabel(tr("X Position:")), 0, 0, 1, 1, Qt::AlignRight);
@@ -78,11 +77,10 @@ c_selection_box_dialog::c_selection_box_dialog(QWidget *parent)
     area_select_GLayout->addWidget(mp_height_SpinBox, 1, 4);
 
     QHBoxLayout *area_select_HLayout = new QHBoxLayout;
-    area_select_HLayout->setMargin(0);
+    area_select_HLayout->setContentsMargins(0, 0, 0, 0);
     area_select_HLayout->setSpacing(0);
     area_select_HLayout->addLayout(area_select_GLayout);
     area_select_HLayout->addStretch();
-
 
     mp_selection_colour_CBox = new QComboBox;
     mp_selection_colour_CBox->addItem(tr("Red"), QVariant(QColor(Qt::red)));
@@ -91,13 +89,16 @@ c_selection_box_dialog::c_selection_box_dialog(QWidget *parent)
     mp_selection_colour_CBox->addItem(tr("Yellow"), QVariant(QColor(Qt::yellow)));
     mp_selection_colour_CBox->addItem(tr("Magenta"), QVariant(QColor(Qt::magenta)));
     mp_selection_colour_CBox->addItem(tr("Cyan"), QVariant(QColor(Qt::cyan)));
-    mp_selection_colour_CBox->addItem(tr("White"),QVariant(QColor(Qt::white)));
+    mp_selection_colour_CBox->addItem(tr("White"), QVariant(QColor(Qt::white)));
     mp_selection_colour_CBox->addItem(tr("Black"), QVariant(QColor(Qt::black)));
     mp_selection_colour_CBox->setCurrentIndex(c_persistent_data::m_selection_box_colour);
-    connect(mp_selection_colour_CBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selection_box_colour_changed()));
+    connect(mp_selection_colour_CBox,
+            SIGNAL(currentIndexChanged(int)),
+            this,
+            SLOT(selection_box_colour_changed()));
 
     QHBoxLayout *colour_select_HLayout = new QHBoxLayout;
-    colour_select_HLayout->setMargin(0);
+    colour_select_HLayout->setContentsMargins(0, 0, 0, 0);
     colour_select_HLayout->setSpacing(5);
     colour_select_HLayout->addWidget(new QLabel(tr("Colour:")));
     colour_select_HLayout->addWidget(mp_selection_colour_CBox);
@@ -107,13 +108,13 @@ c_selection_box_dialog::c_selection_box_dialog(QWidget *parent)
     connect(reset_Button, SIGNAL(clicked(bool)), this, SLOT(reset_selection_box_slot()));
 
     QHBoxLayout *reset_button_HLayout = new QHBoxLayout;
-    reset_button_HLayout->setMargin(0);
+    reset_button_HLayout->setContentsMargins(0, 0, 0, 0);
     reset_button_HLayout->setSpacing(5);
     reset_button_HLayout->addWidget(reset_Button);
     reset_button_HLayout->addStretch();
 
     QVBoxLayout *gbox_VLayout = new QVBoxLayout;
-    gbox_VLayout->setMargin(8);
+    gbox_VLayout->setContentsMargins(8, 8, 8, 8);
     gbox_VLayout->setSpacing(15);
     gbox_VLayout->addLayout(area_select_HLayout);
     gbox_VLayout->addLayout(colour_select_HLayout);
@@ -122,49 +123,45 @@ c_selection_box_dialog::c_selection_box_dialog(QWidget *parent)
     mp_area_select_GroupBox = new QGroupBox(tr("Selection Box"));
     mp_area_select_GroupBox->setLayout(gbox_VLayout);
 
-
     QPushButton *accept_Button = new QPushButton(tr("Accept"));
     QPushButton *cancel_Button = new QPushButton(tr("Cancel"));
     connect(accept_Button, SIGNAL(clicked(bool)), this, SLOT(accept()));
     connect(cancel_Button, SIGNAL(clicked(bool)), this, SLOT(reject()));
 
     QHBoxLayout *accept_button_HLayout = new QHBoxLayout;
-    accept_button_HLayout->setMargin(0);
+    accept_button_HLayout->setContentsMargins(0, 0, 0, 0);
     accept_button_HLayout->setSpacing(10);
     accept_button_HLayout->addStretch();
     accept_button_HLayout->addWidget(accept_Button);
     accept_button_HLayout->addWidget(cancel_Button);
 
     QVBoxLayout *main_VLayout = new QVBoxLayout;
-    main_VLayout->setMargin(10);
+    main_VLayout->setContentsMargins(10, 10, 10, 10);
     main_VLayout->setSpacing(10);
     main_VLayout->addWidget(mp_area_select_GroupBox);
     main_VLayout->addLayout(accept_button_HLayout);
 
     setLayout(main_VLayout);
-    layout()->setSizeConstraint(QLayout::SetFixedSize);  // No resizing
+    layout()->setSizeConstraint(QLayout::SetFixedSize); // No resizing
 }
-
 
 QColor c_selection_box_dialog::get_selection_colour()
 {
     return mp_selection_colour_CBox->currentData().value<QColor>();
 }
 
-
 void c_selection_box_dialog::start_get_selection_box_slot(int width, int height)
 {
     m_width = width;
     m_height = height;
-    mp_x_pos_SpinBox->setRange(0, m_width-1);
-    mp_y_pos_SpinBox->setRange(0, m_height-1);
+    mp_x_pos_SpinBox->setRange(0, m_width - 1);
+    mp_y_pos_SpinBox->setRange(0, m_height - 1);
     mp_width_SpinBox->setRange(15, m_width);
     mp_height_SpinBox->setRange(15, m_height);
     m_spinbox_values_valid = true;
     reset_selection_box_slot();
     show();
 }
-
 
 void c_selection_box_dialog::set_selection_box_slot(const QRect &selection_rect)
 {
@@ -174,13 +171,11 @@ void c_selection_box_dialog::set_selection_box_slot(const QRect &selection_rect)
     mp_height_SpinBox->setValue(selection_rect.height());
 }
 
-
 void c_selection_box_dialog::cancel_get_selection_box_slot()
 {
     reset_selection_box_slot();
     hide();
 }
-
 
 void c_selection_box_dialog::reset_selection_box_slot()
 {
@@ -190,21 +185,18 @@ void c_selection_box_dialog::reset_selection_box_slot()
     mp_height_SpinBox->setValue(m_height);
 }
 
-
-void c_selection_box_dialog::update_selection_box(
-    const QPoint &top_left_corner,
-    const QPoint &bottom_right_corner)
+void c_selection_box_dialog::update_selection_box(const QPoint &top_left_corner,
+                                                  const QPoint &bottom_right_corner)
 {
     int x = top_left_corner.x();
     int y = top_left_corner.y();
-    int width =  bottom_right_corner.x() - top_left_corner.x() + 1;
+    int width = bottom_right_corner.x() - top_left_corner.x() + 1;
     int height = bottom_right_corner.y() - top_left_corner.y() + 1;
     mp_x_pos_SpinBox->setValue(x);
     mp_y_pos_SpinBox->setValue(y);
     mp_width_SpinBox->setValue(width);
     mp_height_SpinBox->setValue(height);
 }
-
 
 //
 // Protected methods
@@ -227,8 +219,6 @@ void c_selection_box_dialog::accept()
     }
 }
 
-
-
 //
 // Private slots
 //
@@ -240,11 +230,11 @@ void c_selection_box_dialog::spinbox_changed_slot()
     if (mp_x_pos_SpinBox->value() + mp_width_SpinBox->value() > m_width) {
         // Value is not currently valid
         m_spinbox_values_valid = false;
-        text_Palette.setColor(QPalette::Text,Qt::red);
+        text_Palette.setColor(QPalette::Text, Qt::red);
         mp_x_pos_SpinBox->setPalette(text_Palette);
         mp_width_SpinBox->setPalette(text_Palette);
     } else {
-        text_Palette.setColor(QPalette::Text,Qt::black);
+        text_Palette.setColor(QPalette::Text, Qt::black);
         mp_x_pos_SpinBox->setPalette(text_Palette);
         mp_width_SpinBox->setPalette(text_Palette);
     }
@@ -252,11 +242,11 @@ void c_selection_box_dialog::spinbox_changed_slot()
     if (mp_y_pos_SpinBox->value() + mp_height_SpinBox->value() > m_height) {
         // Value is not currently valid
         m_spinbox_values_valid = false;
-        text_Palette.setColor(QPalette::Text,Qt::red);
+        text_Palette.setColor(QPalette::Text, Qt::red);
         mp_y_pos_SpinBox->setPalette(text_Palette);
         mp_height_SpinBox->setPalette(text_Palette);
     } else {
-        text_Palette.setColor(QPalette::Text,Qt::black);
+        text_Palette.setColor(QPalette::Text, Qt::black);
         mp_y_pos_SpinBox->setPalette(text_Palette);
         mp_height_SpinBox->setPalette(text_Palette);
     }
@@ -270,7 +260,6 @@ void c_selection_box_dialog::spinbox_changed_slot()
         emit selection_box_changed(new_selected_area);
     }
 }
-
 
 void c_selection_box_dialog::selection_box_colour_changed()
 {

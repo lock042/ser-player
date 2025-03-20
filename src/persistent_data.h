@@ -15,13 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef PERSISTENT_DATA_H
 #define PERSISTENT_DATA_H
 
 #include <QString>
 #include <QStringList>
-
 
 class c_persistent_data
 {
@@ -29,7 +27,7 @@ public:
     //
     // Persistent data
     //
-    static uint m_last_ver_check_time;
+    static qint64 m_last_ver_check_time;
     static QString m_selected_language;
     static QString m_ser_directory;
     static QString m_new_version;
@@ -43,12 +41,10 @@ public:
     static bool m_markers_enabled;
     static int m_selection_box_colour;
 
-
     //
     // Load persistent data from file
     //
     static void load();
-
 
     //
     // Save persistent data to file
@@ -56,5 +52,4 @@ public:
     static void save();
 };
 
-
-#endif  // PERSISTENT_DATA_H
+#endif // PERSISTENT_DATA_H

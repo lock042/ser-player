@@ -15,11 +15,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #include "pipp_utf8.h"
 
 extern "C" {
-    #include "png.h"
+#include "png.h"
 }
 
 #include <cstdint>
@@ -27,22 +26,21 @@ extern "C" {
 #include <memory>
 
 // Support as many libpng versions as required
-#if PNG_LIBPNG_VER_MAJOR==2
-    #error "libpng 2.x.x is not supported"
-#elif PNG_LIBPNG_VER_MAJOR==1 && PNG_LIBPNG_VER_MINOR==7
-    #error "libpng 1.7.x is not supported"
-#elif PNG_LIBPNG_VER_MAJOR==1 && PNG_LIBPNG_VER_MINOR==6
+#if PNG_LIBPNG_VER_MAJOR == 2
+#error "libpng 2.x.x is not supported"
+#elif PNG_LIBPNG_VER_MAJOR == 1 && PNG_LIBPNG_VER_MINOR == 7
+#error "libpng 1.7.x is not supported"
+#elif PNG_LIBPNG_VER_MAJOR == 1 && PNG_LIBPNG_VER_MINOR == 6
 
 // ------------------------------------------
 // Save PNG image
 // ------------------------------------------
-int32_t save_png_file(
-    const char *filename,
-    const uint8_t *p_image_data,
-    uint32_t width,
-    uint32_t height,
-    uint32_t bytes_per_sample,
-    bool is_colour)
+int32_t save_png_file(const char *filename,
+                      const uint8_t *p_image_data,
+                      uint32_t width,
+                      uint32_t height,
+                      uint32_t bytes_per_sample,
+                      bool is_colour)
 {
     int32_t ret = -1;
     png_image image; // The control structure used by libpng
@@ -63,22 +61,21 @@ int32_t save_png_file(
     } else {
         row_stride = image.width * -1;
         if (bytes_per_sample == 1) {
-            image.format = PNG_FORMAT_GRAY;  // 8-bit data
+            image.format = PNG_FORMAT_GRAY; // 8-bit data
         } else {
-            image.format = PNG_FORMAT_LINEAR_Y;  // 16-bit data
+            image.format = PNG_FORMAT_LINEAR_Y; // 16-bit data
         }
     }
 
     FILE *p_png_file = fopen_utf8(filename, "wb");
 
     if (p_png_file != nullptr) {
-        png_image_write_to_stdio(
-            &image,
-            p_png_file,
-            0,  // convert_to_8bit
-            (png_bytep)(p_image_data),
-            row_stride,
-            NULL);  // colormap
+        png_image_write_to_stdio(&image,
+                                 p_png_file,
+                                 0, // convert_to_8bit
+                                 (png_bytep) (p_image_data),
+                                 row_stride,
+                                 NULL); // colormap
         ret = 0;
         fclose(p_png_file);
     }
@@ -86,24 +83,23 @@ int32_t save_png_file(
     return ret;
 }
 
-#elif PNG_LIBPNG_VER_MAJOR==1 && PNG_LIBPNG_VER_MINOR==5
-    #error "libpng 1.5.x is not supported"
-#elif PNG_LIBPNG_VER_MAJOR==1 && PNG_LIBPNG_VER_MINOR==4
-    #error "libpng 1.4.x is not supported"
-#elif PNG_LIBPNG_VER_MAJOR==1 && PNG_LIBPNG_VER_MINOR==3
-    #error "libpng 1.3.x is not supported"
-#elif PNG_LIBPNG_VER_MAJOR==1 && PNG_LIBPNG_VER_MINOR==2
+#elif PNG_LIBPNG_VER_MAJOR == 1 && PNG_LIBPNG_VER_MINOR == 5
+#error "libpng 1.5.x is not supported"
+#elif PNG_LIBPNG_VER_MAJOR == 1 && PNG_LIBPNG_VER_MINOR == 4
+#error "libpng 1.4.x is not supported"
+#elif PNG_LIBPNG_VER_MAJOR == 1 && PNG_LIBPNG_VER_MINOR == 3
+#error "libpng 1.3.x is not supported"
+#elif PNG_LIBPNG_VER_MAJOR == 1 && PNG_LIBPNG_VER_MINOR == 2
 
 // ------------------------------------------
 // Save PNG image
 // ------------------------------------------
-int32_t save_png_file(
-    const char *filename,
-    const uint8_t *p_image_data,
-    uint32_t width,
-    uint32_t height,
-    uint32_t bytes_per_sample,
-    bool is_colour)
+int32_t save_png_file(const char *filename,
+                      const uint8_t *p_image_data,
+                      uint32_t width,
+                      uint32_t height,
+                      uint32_t bytes_per_sample,
+                      bool is_colour)
 {
     int32_t ret = -1;
     png_structp png_ptr;
@@ -128,23 +124,20 @@ int32_t save_png_file(
 
     /* Allocate/initialize the image information data.  REQUIRED */
     info_ptr = png_create_info_struct(png_ptr);
-    if (info_ptr == NULL)
-    {
-       fclose(p_png_file);
-       png_destroy_write_struct(&png_ptr,  png_infopp_NULL);
-       return ret;
+    if (info_ptr == NULL) {
+        fclose(p_png_file);
+        png_destroy_write_struct(&png_ptr, png_infopp_NULL);
+        return ret;
     }
-
 
     /* Set error handling.  REQUIRED if you aren't supplying your own
      * error handling functions in the png_create_write_struct() call.
      */
-    if (setjmp(png_jmpbuf(png_ptr)))
-    {
-       /* If we get here, we had a problem writing the file */
-       fclose(p_png_file);
-       png_destroy_write_struct(&png_ptr, &info_ptr);
-       return ret;
+    if (setjmp(png_jmpbuf(png_ptr))) {
+        /* If we get here, we had a problem writing the file */
+        fclose(p_png_file);
+        png_destroy_write_struct(&png_ptr, &info_ptr);
+        return ret;
     }
 
     /* Set up the output control if you are using standard C streams */
@@ -159,11 +152,25 @@ int32_t save_png_file(
      * currently be PNG_COMPRESSION_TYPE_BASE and PNG_FILTER_TYPE_BASE. REQUIRED
      */
     if (is_colour) {
-        png_set_IHDR(png_ptr, info_ptr, width, height, bytes_per_sample*8, PNG_COLOR_TYPE_RGB,
-           PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+        png_set_IHDR(png_ptr,
+                     info_ptr,
+                     width,
+                     height,
+                     bytes_per_sample * 8,
+                     PNG_COLOR_TYPE_RGB,
+                     PNG_INTERLACE_NONE,
+                     PNG_COMPRESSION_TYPE_BASE,
+                     PNG_FILTER_TYPE_BASE);
     } else {
-        png_set_IHDR(png_ptr, info_ptr, width, height, bytes_per_sample*8, PNG_COLOR_TYPE_GRAY,
-           PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+        png_set_IHDR(png_ptr,
+                     info_ptr,
+                     width,
+                     height,
+                     bytes_per_sample * 8,
+                     PNG_COLOR_TYPE_GRAY,
+                     PNG_INTERLACE_NONE,
+                     PNG_COMPRESSION_TYPE_BASE,
+                     PNG_FILTER_TYPE_BASE);
     }
 
     /* Write the file header information.  REQUIRED */
@@ -186,7 +193,8 @@ int32_t save_png_file(
 
     for (uint32_t i = 0; i < height; i++) {
         // Yuck!  Casting away the const from the pointer as this version of libpng is sloppily written!
-        row_pointers[i] = (uint8_t *)p_image_data + (height - 1 - i) * width * bytes_per_sample * samples_per_pixel;
+        row_pointers[i] = (uint8_t *) p_image_data
+                          + (height - 1 - i) * width * bytes_per_sample * samples_per_pixel;
     }
 
     png_write_image(png_ptr, row_pointers);
@@ -202,6 +210,5 @@ int32_t save_png_file(
 }
 
 #else
-    #error "Unsuported libpng version"
+#error "Unsuported libpng version"
 #endif
-

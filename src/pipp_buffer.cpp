@@ -15,27 +15,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
-#include <cstring>
-#include <cstdlib>
-#include <cstdint>
-#include <iostream>
 #include "pipp_buffer.h"
-
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
 
 using namespace std;
-
 
 // ------------------------------------------
 // Member function to get a new buffer
 // ------------------------------------------
-uint8_t *c_pipp_buffer::get_buffer(
-    uint32_t size)
+uint8_t *c_pipp_buffer::get_buffer(uint32_t size)
 {
     if (size > m_buffer_size) {
         // The current buffer is not big enough
         // Delete the current one and generate a new one that is large enough
-        delete [] mp_buffer;
+        delete[] mp_buffer;
 
         // Calculate buffer size
         m_buffer_size = 128;
@@ -46,7 +42,7 @@ uint8_t *c_pipp_buffer::get_buffer(
         // Create the buffer
         try {
             mp_buffer = new uint8_t[m_buffer_size];
-        } catch(...) {
+        } catch (...) {
             cout << "FATAL ERROR: memory allocation (";
             cout << dec << (size * sizeof(m_buffer_size));
             cout << ") failed in c_pipp_buffer::get_buffer()" << endl;
@@ -58,12 +54,10 @@ uint8_t *c_pipp_buffer::get_buffer(
     return mp_buffer;
 }
 
-
 // ------------------------------------------
 // Member function to get a new zeroed buffer
 // ------------------------------------------
-uint8_t *c_pipp_buffer::get_zero_buffer(
-    uint32_t size)
+uint8_t *c_pipp_buffer::get_zero_buffer(uint32_t size)
 {
     // Call get_buffer() method to create buffer as usual
     get_buffer(size);
@@ -75,12 +69,12 @@ uint8_t *c_pipp_buffer::get_zero_buffer(
     return mp_buffer;
 }
 
-
 // ------------------------------------------
 // Member function to delete buffer
 // ------------------------------------------
-void c_pipp_buffer::delete_buffer() {
-    delete [] mp_buffer;
+void c_pipp_buffer::delete_buffer()
+{
+    delete[] mp_buffer;
     mp_buffer = nullptr;
     m_buffer_size = 0;
 }

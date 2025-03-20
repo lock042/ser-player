@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef IMAGE_WIDGET_H
 #define IMAGE_WIDGET_H
 
@@ -24,14 +23,13 @@
 // Forward declarations
 class c_selection_box_dialog;
 
-
 class c_image_Widget : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit c_image_Widget(QWidget *parent = 0);
-    const QPixmap* pixmap() const;
+    const QPixmap *pixmap() const;
     int get_zoom_level();
     QSize get_image_size();
     void disable_area_selection();
@@ -42,7 +40,7 @@ signals:
     void zoom_changed_signal(int zoom);
 
 public slots:
-    void setPixmap(const QPixmap&);
+    void setPixmap(const QPixmap &);
     void enable_area_selection_slot(const QSize &frame_size, const QRect &selected_area);
     void set_selection_slot(QRect selection);
     void cancel_area_selection_slot();

@@ -17,7 +17,6 @@
 
 #include <QDebug>
 
-#include <Qt>
 #include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
@@ -30,19 +29,19 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QVBoxLayout>
+#include <Qt>
 
-#include "processing_options_dialog.h"
-#include "persistent_data.h"
 #include "icon_groupbox.h"
+#include "persistent_data.h"
 #include "pipp_ser.h"
-
+#include "processing_options_dialog.h"
 
 c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
-    : QDialog(parent),
-      m_frame_width(100),
-      m_frame_height(100),
-      m_data_is_colour(false),
-      m_data_has_bayer_pattern(false)
+    : QDialog(parent)
+    , m_frame_width(100)
+    , m_frame_height(100)
+    , m_data_is_colour(false)
+    , m_data_has_bayer_pattern(false)
 {
     setWindowTitle(tr("Processing"));
     QDialog::setWindowFlags(QDialog::windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -57,11 +56,16 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_bayer_pattern_Combobox->addItem(tr("YCMY"), COLOURID_BAYER_YCMY);
     mp_bayer_pattern_Combobox->addItem(tr("YMCY"), COLOURID_BAYER_YMCY);
     mp_bayer_pattern_Combobox->addItem(tr("MYYC"), COLOURID_BAYER_MYYC);
-    connect(mp_bayer_pattern_Combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(debayer_controls_changed_slot()));
-    mp_bayer_pattern_Combobox->setToolTip(tr("This control allows the frames to be debayered using a different bayer pattern than specified in the SER file header"));
+    connect(mp_bayer_pattern_Combobox,
+            SIGNAL(currentIndexChanged(int)),
+            this,
+            SLOT(debayer_controls_changed_slot()));
+    mp_bayer_pattern_Combobox->setToolTip(
+        tr("This control allows the frames to be debayered using a different bayer pattern than "
+           "specified in the SER file header"));
 
     QFormLayout *bayer_pattern_FLayout = new QFormLayout;
-    bayer_pattern_FLayout->setMargin(5);
+    bayer_pattern_FLayout->setContentsMargins(5, 5, 5, 5);
     bayer_pattern_FLayout->setSpacing(5);
     bayer_pattern_FLayout->addRow(tr("Bayer Pattern:"), mp_bayer_pattern_Combobox);
 
@@ -79,14 +83,13 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     connect(mp_invert_CheckBox, SIGNAL(toggled(bool)), this, SIGNAL(invert_frames(bool)));
 
     QHBoxLayout *invert_HLayout1 = new QHBoxLayout;
-    invert_HLayout1->setMargin(5);
+    invert_HLayout1->setContentsMargins(5, 5, 5, 5);
     invert_HLayout1->addWidget(mp_invert_CheckBox);
 
     c_icon_groupbox *invert_GroupBox = new c_icon_groupbox;
     invert_GroupBox->setTitle(tr("Frame Inversion"));
     invert_GroupBox->set_icon(":/res/resources/invert_icon.png");
     invert_GroupBox->setLayout(invert_HLayout1);
-
 
     // Gain widgets
     mp_gain_Slider = new QSlider(Qt::Horizontal);
@@ -98,7 +101,10 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_gain_DSpinbox->setRange(0.0, 3.0);
     mp_gain_DSpinbox->setSingleStep(0.01);
     mp_gain_DSpinbox->setValue(1.0);
-    connect(mp_gain_DSpinbox, SIGNAL(valueChanged(double)), this, SLOT(gain_spinbox_changed_slot(double)));
+    connect(mp_gain_DSpinbox,
+            SIGNAL(valueChanged(double)),
+            this,
+            SLOT(gain_spinbox_changed_slot(double)));
 
     // Gamma widgets
     mp_gamma_Slider = new QSlider(Qt::Horizontal);
@@ -110,7 +116,10 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_gamma_DSpinbox->setRange(0.1, 3.0);
     mp_gamma_DSpinbox->setSingleStep(0.01);
     mp_gamma_DSpinbox->setValue(1.0);
-    connect(mp_gamma_DSpinbox, SIGNAL(valueChanged(double)), this, SLOT(gamma_spinbox_changed_slot(double)));
+    connect(mp_gamma_DSpinbox,
+            SIGNAL(valueChanged(double)),
+            this,
+            SLOT(gamma_spinbox_changed_slot(double)));
 
     QGridLayout *gain_and_gamma_GLayout = new QGridLayout;
     gain_and_gamma_GLayout->setVerticalSpacing(10);
@@ -131,7 +140,7 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     gamma_HLayout2->addStretch();
 
     QVBoxLayout *gain_and_gamma_Vlayout = new QVBoxLayout;
-    gain_and_gamma_Vlayout->setMargin(5);
+    gain_and_gamma_Vlayout->setContentsMargins(5, 5, 5, 5);
     gain_and_gamma_Vlayout->setSpacing(10);
     gain_and_gamma_Vlayout->addLayout(gain_and_gamma_GLayout);
     gain_and_gamma_Vlayout->addLayout(gamma_HLayout2);
@@ -140,7 +149,6 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     gain_and_gammaGroupBox->setTitle(tr("Gain and Gamma"));
     gain_and_gammaGroupBox->set_icon(":/res/resources/gain_icon.png");
     gain_and_gammaGroupBox->setLayout(gain_and_gamma_Vlayout);
-
 
     //
     // Monochrome Conversion
@@ -155,13 +163,15 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_monochrome_conversion_Combobox->addItem(tr("R & G Channels"));
     mp_monochrome_conversion_Combobox->addItem(tr("R & B Channels"));
     mp_monochrome_conversion_Combobox->addItem(tr("G & B Channels"));
-    connect(mp_monochrome_conversion_Combobox, SIGNAL(activated(int)), this, SLOT(monochrome_conversion_changed_slot()));
+    connect(mp_monochrome_conversion_Combobox,
+            SIGNAL(activated(int)),
+            this,
+            SLOT(monochrome_conversion_changed_slot()));
 
     QHBoxLayout *monochrome_conversion_GroupBox_Hlayout = new QHBoxLayout;
-    monochrome_conversion_GroupBox_Hlayout->setMargin(5);
+    monochrome_conversion_GroupBox_Hlayout->setContentsMargins(5, 5, 5, 5);
     monochrome_conversion_GroupBox_Hlayout->addWidget(monochrome_conversion_Label);
     monochrome_conversion_GroupBox_Hlayout->addWidget(mp_monochrome_conversion_Combobox);
-
 
     mp_monochrome_conversion_GroupBox = new c_icon_groupbox;
     mp_monochrome_conversion_GroupBox->setTitle(tr("Monochrome Conversion"));
@@ -169,10 +179,18 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_monochrome_conversion_GroupBox->setCheckable(true);
     mp_monochrome_conversion_GroupBox->setChecked(false);
     mp_monochrome_conversion_GroupBox->setLayout(monochrome_conversion_GroupBox_Hlayout);
-    connect(mp_monochrome_conversion_GroupBox, SIGNAL(toggled(bool)), this, SLOT(monochrome_conversion_changed_slot()));
-    connect(mp_monochrome_conversion_GroupBox, SIGNAL(toggled(bool)), this, SLOT(colour_saturation_spinbox_changed_slot()));
-    connect(mp_monochrome_conversion_GroupBox, SIGNAL(toggled(bool)), this, SLOT(red_balance_spinbox_changed_slot()));
-
+    connect(mp_monochrome_conversion_GroupBox,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(monochrome_conversion_changed_slot()));
+    connect(mp_monochrome_conversion_GroupBox,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(colour_saturation_spinbox_changed_slot()));
+    connect(mp_monochrome_conversion_GroupBox,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(red_balance_spinbox_changed_slot()));
 
     //
     // Colour channel align
@@ -193,25 +211,25 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     QPixmap left_Pixmap = QPixmap(":/res/resources/back_button.png");
     red_left_PushButton->setIcon(left_Pixmap);
     red_left_PushButton->setIconSize(left_Pixmap.size());
-    red_left_PushButton->setFixedSize(left_Pixmap.size() + QSize(10, 10));  // Nice and small
+    red_left_PushButton->setFixedSize(left_Pixmap.size() + QSize(10, 10)); // Nice and small
 
     QPushButton *red_right_PushButton = new QPushButton;
     QPixmap right_Pixmap = QPixmap(":/res/resources/forward_button.png");
     red_right_PushButton->setIcon(right_Pixmap);
     red_right_PushButton->setIconSize(right_Pixmap.size());
-    red_right_PushButton->setFixedSize(right_Pixmap.size() + QSize(10, 10));  // Nice and small
+    red_right_PushButton->setFixedSize(right_Pixmap.size() + QSize(10, 10)); // Nice and small
 
     QPushButton *red_up_PushButton = new QPushButton;
     QPixmap up_Pixmap = QPixmap(":/res/resources/up_button.png");
     red_up_PushButton->setIcon(up_Pixmap);
     red_up_PushButton->setIconSize(up_Pixmap.size());
-    red_up_PushButton->setFixedSize(up_Pixmap.size() + QSize(10, 10));  // Nice and small
+    red_up_PushButton->setFixedSize(up_Pixmap.size() + QSize(10, 10)); // Nice and small
 
     QPushButton *red_down_PushButton = new QPushButton;
     QPixmap down_Pixmap = QPixmap(":/res/resources/down_button.png");
     red_down_PushButton->setIcon(down_Pixmap);
     red_down_PushButton->setIconSize(down_Pixmap.size());
-    red_down_PushButton->setFixedSize(down_Pixmap.size() + QSize(10, 10));  // Nice and small
+    red_down_PushButton->setFixedSize(down_Pixmap.size() + QSize(10, 10)); // Nice and small
 
     QGridLayout *red_buttons_GLayout = new QGridLayout;
 #ifdef __APPLE__
@@ -221,27 +239,27 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     red_buttons_GLayout->setVerticalSpacing(0);
     red_buttons_GLayout->setHorizontalSpacing(0);
 #endif
-    red_buttons_GLayout->setMargin(0);
+    red_buttons_GLayout->setContentsMargins(0, 0, 0, 0);
     red_buttons_GLayout->addWidget(red_up_PushButton, 0, 1);
     red_buttons_GLayout->addWidget(red_left_PushButton, 1, 0);
     red_buttons_GLayout->addWidget(red_right_PushButton, 1, 2);
     red_buttons_GLayout->addWidget(red_down_PushButton, 2, 1);
 
     QFormLayout *red_spinboxes_FLayout = new QFormLayout;
-    red_spinboxes_FLayout->setMargin(0);
+    red_spinboxes_FLayout->setContentsMargins(0, 0, 0, 0);
     red_spinboxes_FLayout->setSpacing(5);
     red_spinboxes_FLayout->addRow("x:", mp_red_x_Spinbox);
     red_spinboxes_FLayout->addRow("y:", mp_red_y_Spinbox);
 
     QVBoxLayout *red_spinboxes_VLayout = new QVBoxLayout;
-    red_spinboxes_VLayout->setMargin(0);
+    red_spinboxes_VLayout->setContentsMargins(0, 0, 0, 0);
     red_spinboxes_VLayout->setSpacing(0);
     red_spinboxes_VLayout->addStretch();
     red_spinboxes_VLayout->addLayout(red_spinboxes_FLayout);
     red_spinboxes_VLayout->addStretch();
 
     QHBoxLayout *red_controls_HLayout = new QHBoxLayout;
-    red_controls_HLayout->setMargin(5);
+    red_controls_HLayout->setContentsMargins(5, 5, 5, 5);
     red_controls_HLayout->addLayout(red_buttons_GLayout);
     red_controls_HLayout->addLayout(red_spinboxes_VLayout);
 
@@ -251,22 +269,22 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     QPushButton *blue_left_PushButton = new QPushButton;
     blue_left_PushButton->setIcon(left_Pixmap);
     blue_left_PushButton->setIconSize(left_Pixmap.size());
-    blue_left_PushButton->setFixedSize(left_Pixmap.size() + QSize(10, 10));  // Nice and small
+    blue_left_PushButton->setFixedSize(left_Pixmap.size() + QSize(10, 10)); // Nice and small
 
     QPushButton *blue_right_PushButton = new QPushButton;
     blue_right_PushButton->setIcon(right_Pixmap);
     blue_right_PushButton->setIconSize(right_Pixmap.size());
-    blue_right_PushButton->setFixedSize(right_Pixmap.size() + QSize(10, 10));  // Nice and small
+    blue_right_PushButton->setFixedSize(right_Pixmap.size() + QSize(10, 10)); // Nice and small
 
     QPushButton *blue_up_PushButton = new QPushButton;
     blue_up_PushButton->setIcon(up_Pixmap);
     blue_up_PushButton->setIconSize(up_Pixmap.size());
-    blue_up_PushButton->setFixedSize(up_Pixmap.size() + QSize(10, 10));  // Nice and small
+    blue_up_PushButton->setFixedSize(up_Pixmap.size() + QSize(10, 10)); // Nice and small
 
     QPushButton *blue_down_PushButton = new QPushButton;
     blue_down_PushButton->setIcon(down_Pixmap);
     blue_down_PushButton->setIconSize(down_Pixmap.size());
-    blue_down_PushButton->setFixedSize(down_Pixmap.size() + QSize(10, 10));  // Nice and small
+    blue_down_PushButton->setFixedSize(down_Pixmap.size() + QSize(10, 10)); // Nice and small
 
     QGridLayout *blue_buttons_GLayout = new QGridLayout;
 #ifdef __APPLE__
@@ -276,27 +294,27 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     blue_buttons_GLayout->setVerticalSpacing(0);
     blue_buttons_GLayout->setHorizontalSpacing(0);
 #endif
-    blue_buttons_GLayout->setMargin(0);
+    blue_buttons_GLayout->setContentsMargins(0, 0, 0, 0);
     blue_buttons_GLayout->addWidget(blue_up_PushButton, 0, 1);
     blue_buttons_GLayout->addWidget(blue_left_PushButton, 1, 0);
     blue_buttons_GLayout->addWidget(blue_right_PushButton, 1, 2);
     blue_buttons_GLayout->addWidget(blue_down_PushButton, 2, 1);
 
     QFormLayout *blue_spinboxes_FLayout = new QFormLayout;
-    blue_spinboxes_FLayout->setMargin(0);
+    blue_spinboxes_FLayout->setContentsMargins(0, 0, 0, 0);
     blue_spinboxes_FLayout->setSpacing(5);
     blue_spinboxes_FLayout->addRow("x:", mp_blue_x_Spinbox);
     blue_spinboxes_FLayout->addRow("y:", mp_blue_y_Spinbox);
 
     QVBoxLayout *blue_spinboxes_VLayout = new QVBoxLayout;
-    blue_spinboxes_VLayout->setMargin(0);
+    blue_spinboxes_VLayout->setContentsMargins(0, 0, 0, 0);
     blue_spinboxes_VLayout->setSpacing(0);
     blue_spinboxes_VLayout->addStretch();
     blue_spinboxes_VLayout->addLayout(blue_spinboxes_FLayout);
     blue_spinboxes_VLayout->addStretch();
 
     QHBoxLayout *blue_controls_HLayout = new QHBoxLayout;
-    blue_controls_HLayout->setMargin(5);
+    blue_controls_HLayout->setContentsMargins(5, 5, 5, 5);
     blue_controls_HLayout->addLayout(blue_buttons_GLayout);
     blue_controls_HLayout->addLayout(blue_spinboxes_VLayout);
 
@@ -310,7 +328,7 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     QPushButton *colour_align_reset_Button = new QPushButton(tr("Reset"));
 
     QVBoxLayout *colour_align_VLayout = new QVBoxLayout;
-    colour_align_VLayout->setMargin(5);
+    colour_align_VLayout->setContentsMargins(5, 5, 5, 5);
     colour_align_VLayout->setSpacing(5);
     colour_align_VLayout->addLayout(colour_align_HLayout);
     colour_align_VLayout->addWidget(colour_align_reset_Button, 0, Qt::AlignLeft | Qt::AlignVCenter);
@@ -337,7 +355,6 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     connect(mp_red_x_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(colour_align_changed_slot()));
     connect(mp_red_y_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(colour_align_changed_slot()));
 
-
     //
     // Colour Saturation
     //
@@ -345,13 +362,19 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_colsat_Slider->setRange(0, 1500);
     mp_colsat_Slider->setValue(100);
     mp_colsat_Slider->setMinimumWidth(mp_colsat_Slider->sizeHint().width() * 2);
-    connect(mp_colsat_Slider, SIGNAL(sliderMoved(int)), this, SLOT(colour_saturation_slider_changed_slot(int)));
+    connect(mp_colsat_Slider,
+            SIGNAL(sliderMoved(int)),
+            this,
+            SLOT(colour_saturation_slider_changed_slot(int)));
     mp_colsat_DSpinbox = new QDoubleSpinBox;
     mp_colsat_DSpinbox->setRange(0.0, 15.0);
     mp_colsat_DSpinbox->setSingleStep(0.01);
     mp_colsat_DSpinbox->setValue(1.0);
 
-    connect(mp_colsat_DSpinbox, SIGNAL(valueChanged(double)), this, SLOT(colour_saturation_spinbox_changed_slot()));
+    connect(mp_colsat_DSpinbox,
+            SIGNAL(valueChanged(double)),
+            this,
+            SLOT(colour_saturation_spinbox_changed_slot()));
 
     QHBoxLayout *colsat_hlayout1 = new QHBoxLayout;
     colsat_hlayout1->addWidget(new QLabel(tr("Saturation")));
@@ -360,12 +383,15 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
 
     QPushButton *reset_colour_saturation_button = new QPushButton(tr("Reset"));
     reset_colour_saturation_button->setAutoDefault(false);
-    connect(reset_colour_saturation_button, SIGNAL(clicked()), this, SLOT(reset_colour_saturation_slot()));
+    connect(reset_colour_saturation_button,
+            SIGNAL(clicked()),
+            this,
+            SLOT(reset_colour_saturation_slot()));
     QHBoxLayout *colsat_hlayout2 = new QHBoxLayout;
     colsat_hlayout2->addWidget(reset_colour_saturation_button);
     colsat_hlayout2->addStretch();
     QVBoxLayout *colsat_vlayout = new QVBoxLayout;
-    colsat_vlayout->setMargin(5);
+    colsat_vlayout->setContentsMargins(5, 5, 5, 5);
     colsat_vlayout->setSpacing(10);
     colsat_vlayout->addLayout(colsat_hlayout1);
     colsat_vlayout->addLayout(colsat_hlayout2);
@@ -375,7 +401,6 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_colour_saturation_GroupBox->set_icon(":/res/resources/saturation_icon.png");
     mp_colour_saturation_GroupBox->setLayout(colsat_vlayout);
 
-
     //
     // Colour balance
     //
@@ -383,29 +408,47 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_red_balance_Slider->setRange(-100, 100);
     mp_red_balance_Slider->setValue(0);
     mp_red_balance_Slider->setMinimumWidth(mp_red_balance_Slider->sizeHint().width() * 2);
-    connect(mp_red_balance_Slider, SIGNAL(sliderMoved(int)), this, SLOT(red_balance_slider_changed_slot(int)));
+    connect(mp_red_balance_Slider,
+            SIGNAL(sliderMoved(int)),
+            this,
+            SLOT(red_balance_slider_changed_slot(int)));
     mp_red_balance_SpinBox = new QSpinBox;
     mp_red_balance_SpinBox->setRange(-100, 100);
     mp_red_balance_SpinBox->setValue(0);
-    connect(mp_red_balance_SpinBox, SIGNAL(valueChanged(int)), this, SLOT(red_balance_spinbox_changed_slot()));
+    connect(mp_red_balance_SpinBox,
+            SIGNAL(valueChanged(int)),
+            this,
+            SLOT(red_balance_spinbox_changed_slot()));
 
     mp_green_balance_Slider = new QSlider(Qt::Horizontal);
     mp_green_balance_Slider->setRange(-100, 100);
     mp_green_balance_Slider->setValue(0);
-    connect(mp_green_balance_Slider, SIGNAL(sliderMoved(int)), this, SLOT(green_balance_slider_changed_slot(int)));
+    connect(mp_green_balance_Slider,
+            SIGNAL(sliderMoved(int)),
+            this,
+            SLOT(green_balance_slider_changed_slot(int)));
     mp_green_balance_SpinBox = new QSpinBox;
     mp_green_balance_SpinBox->setRange(-100, 100);
     mp_green_balance_SpinBox->setValue(0);
-    connect(mp_green_balance_SpinBox, SIGNAL(valueChanged(int)), this, SLOT(green_balance_spinbox_changed_slot()));
+    connect(mp_green_balance_SpinBox,
+            SIGNAL(valueChanged(int)),
+            this,
+            SLOT(green_balance_spinbox_changed_slot()));
 
     mp_blue_balance_Slider = new QSlider(Qt::Horizontal);
     mp_blue_balance_Slider->setRange(-100, 100);
     mp_blue_balance_Slider->setValue(0);
-    connect(mp_blue_balance_Slider, SIGNAL(sliderMoved(int)), this, SLOT(blue_balance_slider_changed_slot(int)));
+    connect(mp_blue_balance_Slider,
+            SIGNAL(sliderMoved(int)),
+            this,
+            SLOT(blue_balance_slider_changed_slot(int)));
     mp_blue_balance_SpinBox = new QSpinBox;
     mp_blue_balance_SpinBox->setRange(-100, 100);
     mp_blue_balance_SpinBox->setValue(0);
-    connect(mp_blue_balance_SpinBox, SIGNAL(valueChanged(int)), this, SLOT(blue_balance_spinbox_changed_slot()));
+    connect(mp_blue_balance_SpinBox,
+            SIGNAL(valueChanged(int)),
+            this,
+            SLOT(blue_balance_spinbox_changed_slot()));
 
     QGridLayout *colour_balance_GLayout = new QGridLayout;
     colour_balance_GLayout->setVerticalSpacing(10);
@@ -423,19 +466,23 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     QPushButton *reset_colour_balance_button = new QPushButton(tr("Reset"));
     reset_colour_balance_button->setAutoDefault(false);
     connect(reset_colour_balance_button, SIGNAL(clicked()), this, SLOT(reset_colour_balance_slot()));
-    QPushButton *estimate_colour_balance_button = new QPushButton(tr("Estimate", "Estimate Colour Balance Button"));
+    QPushButton *estimate_colour_balance_button = new QPushButton(
+        tr("Estimate", "Estimate Colour Balance Button"));
     estimate_colour_balance_button->setAutoDefault(false);
-    connect(estimate_colour_balance_button, SIGNAL(clicked()), this, SIGNAL(estimate_colour_balance()));
+    connect(estimate_colour_balance_button,
+            SIGNAL(clicked()),
+            this,
+            SIGNAL(estimate_colour_balance()));
 
     QHBoxLayout *colour_balance_HLayout = new QHBoxLayout;
-    colour_balance_HLayout->setMargin(0);
+    colour_balance_HLayout->setContentsMargins(0, 0, 0, 0);
     colour_balance_HLayout->setSpacing(5);
     colour_balance_HLayout->addWidget(reset_colour_balance_button);
     colour_balance_HLayout->addWidget(estimate_colour_balance_button);
     colour_balance_HLayout->addStretch();
 
     QVBoxLayout *colour_balance_VLayout = new QVBoxLayout;
-    colour_balance_VLayout->setMargin(5);
+    colour_balance_VLayout->setContentsMargins(0, 0, 0, 0);
     colour_balance_VLayout->setSpacing(10);
     colour_balance_VLayout->addLayout(colour_balance_GLayout);
     colour_balance_VLayout->addLayout(colour_balance_HLayout);
@@ -444,7 +491,6 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_colour_balance_GroupBox->setTitle(tr("Colour Balance"));
     mp_colour_balance_GroupBox->set_icon(":/res/resources/colour_balance_icon.png");
     mp_colour_balance_GroupBox->setLayout(colour_balance_VLayout);
-
 
     //
     // Crop controls
@@ -455,8 +501,8 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     mp_crop_height_Spinbox = new QSpinBox;
     setup_crop_spinboxes();
 
-    QGridLayout *frame_crop_GLayout = new QGridLayout;   
-    frame_crop_GLayout->setMargin(0);
+    QGridLayout *frame_crop_GLayout = new QGridLayout;
+    frame_crop_GLayout->setContentsMargins(0, 0, 0, 0);
     frame_crop_GLayout->setHorizontalSpacing(10);
     frame_crop_GLayout->setVerticalSpacing(8);
     frame_crop_GLayout->addWidget(new QLabel(tr("X Position:")), 0, 0, 1, 1, Qt::AlignRight);
@@ -472,22 +518,25 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     frame_crop_GLayout->addWidget(mp_crop_height_Spinbox, 1, 4);
 
     QHBoxLayout *frame_crop_HLayout = new QHBoxLayout;
-    frame_crop_HLayout->setMargin(5);
+    frame_crop_HLayout->setContentsMargins(5, 5, 5, 5);
     frame_crop_HLayout->setSpacing(0);
     frame_crop_HLayout->addLayout(frame_crop_GLayout);
     frame_crop_HLayout->addStretch();
 
     QPushButton *crop_set_with_selection_box_button = new QPushButton(tr("Set With Selection Box"));
-    connect(crop_set_with_selection_box_button, SIGNAL(clicked(bool)), this, SLOT(crop_selection_button_pressed_slot()));
+    connect(crop_set_with_selection_box_button,
+            SIGNAL(clicked(bool)),
+            this,
+            SLOT(crop_selection_button_pressed_slot()));
 
     QHBoxLayout *crop_buttons_hlayout = new QHBoxLayout;
-    crop_buttons_hlayout->setMargin(5);
+    crop_buttons_hlayout->setContentsMargins(5, 5, 5, 5);
     crop_buttons_hlayout->setSpacing(0);
     crop_buttons_hlayout->addWidget(crop_set_with_selection_box_button);
     crop_buttons_hlayout->addStretch();
 
     QVBoxLayout *crop_groupbox_vlayout = new QVBoxLayout;
-    crop_groupbox_vlayout->setMargin(0);
+    crop_groupbox_vlayout->setContentsMargins(0, 0, 0, 0);
     crop_groupbox_vlayout->setSpacing(0);
     crop_groupbox_vlayout->addLayout(frame_crop_HLayout);
     crop_groupbox_vlayout->addLayout(crop_buttons_hlayout);
@@ -505,9 +554,8 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     connect(mp_crop_width_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(crop_changed_slot()));
     connect(mp_crop_height_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(crop_changed_slot()));
 
-
     QVBoxLayout *dialog_lhs_vlayout = new QVBoxLayout;
-    dialog_lhs_vlayout->setMargin(0);
+    dialog_lhs_vlayout->setContentsMargins(0, 0, 0, 0);
     dialog_lhs_vlayout->setSpacing(10);
     dialog_lhs_vlayout->addWidget(mp_debayer_GroupBox);
     dialog_lhs_vlayout->addWidget(invert_GroupBox);
@@ -516,7 +564,7 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     dialog_lhs_vlayout->addStretch();
 
     QVBoxLayout *dialog_rhs_vlayout = new QVBoxLayout;
-    dialog_rhs_vlayout->setMargin(0);
+    dialog_rhs_vlayout->setContentsMargins(0, 0, 0, 0);
     dialog_rhs_vlayout->setSpacing(10);
 
     dialog_rhs_vlayout->addWidget(mp_monochrome_conversion_GroupBox);
@@ -526,7 +574,7 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     dialog_rhs_vlayout->addStretch();
 
     QHBoxLayout *dialog_hlayout = new QHBoxLayout;
-    dialog_hlayout->setMargin(10);
+    dialog_hlayout->setContentsMargins(10, 10, 10, 10);
     dialog_hlayout->setSpacing(10);
     dialog_hlayout->addLayout(dialog_lhs_vlayout);
     dialog_hlayout->addLayout(dialog_rhs_vlayout);
@@ -537,7 +585,6 @@ c_processing_options_dialog::c_processing_options_dialog(QWidget *parent)
     // Debug
 }
 
-
 void c_processing_options_dialog::crop_changed_slot()
 {
     QPalette text_Palette;
@@ -545,11 +592,11 @@ void c_processing_options_dialog::crop_changed_slot()
     if (mp_crop_x_start_Spinbox->value() + mp_crop_width_Spinbox->value() > m_frame_width) {
         // Value is not currently valid
         crop_spinbox_values_valid = false;
-        text_Palette.setColor(QPalette::Text,Qt::red);
+        text_Palette.setColor(QPalette::Text, Qt::red);
         mp_crop_x_start_Spinbox->setPalette(text_Palette);
         mp_crop_width_Spinbox->setPalette(text_Palette);
     } else {
-        text_Palette.setColor(QPalette::Text,QApplication::palette().text().color());
+        text_Palette.setColor(QPalette::Text, QApplication::palette().text().color());
         mp_crop_x_start_Spinbox->setPalette(text_Palette);
         mp_crop_width_Spinbox->setPalette(text_Palette);
     }
@@ -558,11 +605,11 @@ void c_processing_options_dialog::crop_changed_slot()
         // Value is not currently valid
         crop_spinbox_values_valid = false;
 
-        text_Palette.setColor(QPalette::Text,Qt::red);
+        text_Palette.setColor(QPalette::Text, Qt::red);
         mp_crop_y_start_Spinbox->setPalette(text_Palette);
         mp_crop_height_Spinbox->setPalette(text_Palette);
     } else {
-        text_Palette.setColor(QPalette::Text,QApplication::palette().text().color());
+        text_Palette.setColor(QPalette::Text, QApplication::palette().text().color());
         mp_crop_y_start_Spinbox->setPalette(text_Palette);
         mp_crop_height_Spinbox->setPalette(text_Palette);
     }
@@ -570,15 +617,13 @@ void c_processing_options_dialog::crop_changed_slot()
     bool enabled = mp_crop_Groupbox->isChecked() & isEnabled();
     if (crop_spinbox_values_valid || !enabled) {
         // Emit signal if all spinbox values are valid or crop is not enabled
-        emit crop_changed(
-                    enabled,
-                    mp_crop_x_start_Spinbox->value(),
-                    mp_crop_y_start_Spinbox->value(),
-                    mp_crop_width_Spinbox->value(),
-                    mp_crop_height_Spinbox->value());
+        emit crop_changed(enabled,
+                          mp_crop_x_start_Spinbox->value(),
+                          mp_crop_y_start_Spinbox->value(),
+                          mp_crop_width_Spinbox->value(),
+                          mp_crop_height_Spinbox->value());
     }
 }
-
 
 void c_processing_options_dialog::debayer_controls_changed_slot()
 {
@@ -586,12 +631,10 @@ void c_processing_options_dialog::debayer_controls_changed_slot()
     emit update_image_req();
 }
 
-
 void c_processing_options_dialog::gain_slider_changed_slot(int gain)
 {
-    mp_gain_DSpinbox->setValue(((double)gain/100.0));
+    mp_gain_DSpinbox->setValue(((double) gain / 100.0));
 }
-
 
 void c_processing_options_dialog::gain_spinbox_changed_slot(double gain)
 {
@@ -599,19 +642,16 @@ void c_processing_options_dialog::gain_spinbox_changed_slot(double gain)
     emit gain_changed(gain);
 }
 
-
 void c_processing_options_dialog::reset_gain_and_gamma_slot()
 {
     mp_gain_DSpinbox->setValue(1.0);
     mp_gamma_DSpinbox->setValue(1.0);
 }
 
-
 void c_processing_options_dialog::gamma_slider_changed_slot(int gamma)
 {
-    mp_gamma_DSpinbox->setValue(((double)gamma/100.0));
+    mp_gamma_DSpinbox->setValue(((double) gamma / 100.0));
 }
-
 
 void c_processing_options_dialog::gamma_spinbox_changed_slot(double gamma)
 {
@@ -619,26 +659,23 @@ void c_processing_options_dialog::gamma_spinbox_changed_slot(double gamma)
     emit gamma_changed(gamma);
 }
 
-
 void c_processing_options_dialog::monochrome_conversion_changed_slot()
 {
     enable_and_disable_controls();
-    emit monochrome_conversion_changed(mp_monochrome_conversion_GroupBox->isChecked(), mp_monochrome_conversion_Combobox->currentIndex());
+    emit monochrome_conversion_changed(mp_monochrome_conversion_GroupBox->isChecked(),
+                                       mp_monochrome_conversion_Combobox->currentIndex());
 }
-
 
 void c_processing_options_dialog::colour_saturation_slider_changed_slot(int sat)
 {
-    mp_colsat_DSpinbox->setValue(((double)sat/100.0));
+    mp_colsat_DSpinbox->setValue(((double) sat / 100.0));
 }
-
 
 void c_processing_options_dialog::colour_saturation_spinbox_changed_slot()
 {
     mp_colsat_Slider->setValue(100 * mp_colsat_DSpinbox->value());
     emit this->update_image_req();
 }
-
 
 void c_processing_options_dialog::red_balance_slider_changed_slot(int balance)
 {
@@ -649,31 +686,26 @@ void c_processing_options_dialog::red_balance_spinbox_changed_slot()
 {
     mp_red_balance_Slider->setValue(mp_red_balance_SpinBox->value());
     if (mp_red_balance_SpinBox->isEnabled()) {
-        emit colour_balance_changed(
-                    1.0 + (double)mp_red_balance_SpinBox->value() / 300,
-                    1.0 + (double)mp_green_balance_SpinBox->value() / 300,
-                    1.0 + (double)mp_blue_balance_SpinBox->value() / 300);
+        emit colour_balance_changed(1.0 + (double) mp_red_balance_SpinBox->value() / 300,
+                                    1.0 + (double) mp_green_balance_SpinBox->value() / 300,
+                                    1.0 + (double) mp_blue_balance_SpinBox->value() / 300);
     } else {
         emit colour_balance_changed(1.0, 1.0, 1.0);
     }
 }
-
 
 void c_processing_options_dialog::green_balance_slider_changed_slot(int balance)
 {
     mp_green_balance_SpinBox->setValue(balance);
 }
 
-
 void c_processing_options_dialog::green_balance_spinbox_changed_slot()
 {
     mp_green_balance_Slider->setValue(mp_green_balance_SpinBox->value());
-    emit colour_balance_changed(
-                1.0 + (double)mp_red_balance_SpinBox->value() / 300,
-                1.0 + (double)mp_green_balance_SpinBox->value() / 300,
-                1.0 + (double)mp_blue_balance_SpinBox->value() / 300);
+    emit colour_balance_changed(1.0 + (double) mp_red_balance_SpinBox->value() / 300,
+                                1.0 + (double) mp_green_balance_SpinBox->value() / 300,
+                                1.0 + (double) mp_blue_balance_SpinBox->value() / 300);
 }
-
 
 void c_processing_options_dialog::blue_balance_slider_changed_slot(int balance)
 {
@@ -683,12 +715,10 @@ void c_processing_options_dialog::blue_balance_slider_changed_slot(int balance)
 void c_processing_options_dialog::blue_balance_spinbox_changed_slot()
 {
     mp_blue_balance_Slider->setValue(mp_blue_balance_SpinBox->value());
-    emit colour_balance_changed(
-                1.0 + (double)mp_red_balance_SpinBox->value() / 300,
-                1.0 + (double)mp_green_balance_SpinBox->value() / 300,
-                1.0 + (double)mp_blue_balance_SpinBox->value() / 300);
+    emit colour_balance_changed(1.0 + (double) mp_red_balance_SpinBox->value() / 300,
+                                1.0 + (double) mp_green_balance_SpinBox->value() / 300,
+                                1.0 + (double) mp_blue_balance_SpinBox->value() / 300);
 }
-
 
 void c_processing_options_dialog::colour_align_changed_slot()
 {
@@ -698,11 +728,10 @@ void c_processing_options_dialog::colour_align_changed_slot()
                               mp_blue_y_Spinbox->value());
 }
 
-
 void c_processing_options_dialog::crop_selection_button_pressed_slot()
 {
-    setEnabled(false);  // Disable this processing options dialog
-    crop_changed_slot();  // Signal that the crop has changed (no longer enabled)
+    setEnabled(false);   // Disable this processing options dialog
+    crop_changed_slot(); // Signal that the crop has changed (no longer enabled)
     QSize frame_size = QSize(m_frame_width, m_frame_height);
     QRect selected_area = QRect(mp_crop_x_start_Spinbox->value(),
                                 mp_crop_y_start_Spinbox->value(),
@@ -710,7 +739,6 @@ void c_processing_options_dialog::crop_selection_button_pressed_slot()
                                 mp_crop_height_Spinbox->value());
     emit enable_area_selection_signal(frame_size, selected_area);
 }
-
 
 void c_processing_options_dialog::crop_selection_complete_slot(bool accepted, QRect selected_area)
 {
@@ -722,15 +750,13 @@ void c_processing_options_dialog::crop_selection_complete_slot(bool accepted, QR
     }
 
     setEnabled(true);
-    crop_changed_slot();  // Signal that the crop has changed
+    crop_changed_slot(); // Signal that the crop has changed
 }
-
 
 void c_processing_options_dialog::reset_colour_saturation_slot()
 {
     mp_colsat_DSpinbox->setValue(1.0);
 }
-
 
 void c_processing_options_dialog::reset_colour_balance_slot()
 {
@@ -747,7 +773,6 @@ void c_processing_options_dialog::reset_colour_align_slot()
     mp_red_y_Spinbox->setValue(0);
 }
 
-
 void c_processing_options_dialog::reset_all_slot()
 {
     mp_debayer_GroupBox->setChecked(true);
@@ -761,14 +786,12 @@ void c_processing_options_dialog::reset_all_slot()
     mp_crop_Groupbox->setChecked(false);
 }
 
-
 void c_processing_options_dialog::set_frame_size(int width, int height)
 {
     m_frame_width = width;
     m_frame_height = height;
     setup_crop_spinboxes();
 }
-
 
 void c_processing_options_dialog::setup_crop_spinboxes()
 {
@@ -784,7 +807,6 @@ void c_processing_options_dialog::setup_crop_spinboxes()
     mp_crop_height_Spinbox->setRange(15, m_frame_height);
     mp_crop_height_Spinbox->setValue(m_frame_height);
 }
-
 
 void c_processing_options_dialog::set_colour_balance(double red, double green, double blue)
 {
@@ -820,19 +842,19 @@ void c_processing_options_dialog::set_colour_balance(double red, double green, d
             reduction -= (over_reduction / 2);
         }
 
-
         red_int -= reduction;
         green_int -= reduction;
         blue_int -= reduction;
     }
 
-
     red_int < (mp_red_balance_SpinBox->minimum()) ? mp_red_balance_SpinBox->minimum() : red_int;
-    green_int < (mp_green_balance_SpinBox->minimum()) ? mp_green_balance_SpinBox->minimum() : green_int;
+    green_int < (mp_green_balance_SpinBox->minimum()) ? mp_green_balance_SpinBox->minimum()
+                                                      : green_int;
     blue_int < (mp_blue_balance_SpinBox->minimum()) ? mp_blue_balance_SpinBox->minimum() : blue_int;
 
     red_int > (mp_red_balance_SpinBox->maximum()) ? mp_red_balance_SpinBox->maximum() : red_int;
-    green_int > (mp_green_balance_SpinBox->maximum()) ? mp_green_balance_SpinBox->maximum() : green_int;
+    green_int > (mp_green_balance_SpinBox->maximum()) ? mp_green_balance_SpinBox->maximum()
+                                                      : green_int;
     blue_int > (mp_blue_balance_SpinBox->maximum()) ? mp_blue_balance_SpinBox->maximum() : blue_int;
 
     mp_red_balance_SpinBox->setValue(red_int);
@@ -840,30 +862,27 @@ void c_processing_options_dialog::set_colour_balance(double red, double green, d
     mp_blue_balance_SpinBox->setValue(blue_int);
 }
 
-
-void c_processing_options_dialog::set_data_has_bayer_pattern(bool bayer_pattern) {
+void c_processing_options_dialog::set_data_has_bayer_pattern(bool bayer_pattern)
+{
     m_data_has_bayer_pattern = bayer_pattern;
     enable_and_disable_controls();
 }
 
-
-void c_processing_options_dialog::set_data_is_colour(bool colour) {
+void c_processing_options_dialog::set_data_is_colour(bool colour)
+{
     m_data_is_colour = colour;
     enable_and_disable_controls();
 }
-
 
 bool c_processing_options_dialog::get_debayer_enable()
 {
     return m_data_has_bayer_pattern && mp_debayer_GroupBox->isChecked();
 }
 
-
 int c_processing_options_dialog::get_debayer_pattern()
 {
     return mp_bayer_pattern_Combobox->currentData().toInt();
 }
-
 
 double c_processing_options_dialog::get_colour_saturation()
 {
@@ -879,26 +898,21 @@ double c_processing_options_dialog::get_colour_saturation()
     return colour_saturation;
 }
 
-
 bool c_processing_options_dialog::get_processed_data_is_colour()
 {
     bool data_is_colour = m_data_is_colour;
-    if (m_data_has_bayer_pattern)
-    {
-        if (mp_debayer_GroupBox->isChecked())
-        {
+    if (m_data_has_bayer_pattern) {
+        if (mp_debayer_GroupBox->isChecked()) {
             data_is_colour = true;
         }
     }
 
-    if (mp_monochrome_conversion_GroupBox->isChecked())
-    {
+    if (mp_monochrome_conversion_GroupBox->isChecked()) {
         data_is_colour = false;
     }
 
     return data_is_colour;
 }
-
 
 void c_processing_options_dialog::enable_and_disable_controls()
 {
@@ -938,7 +952,6 @@ void c_processing_options_dialog::enable_and_disable_controls()
     mp_colour_balance_GroupBox->setEnabled(enable_colour_controls);
     mp_colour_balance_GroupBox->setVisible(enable_colour_controls);
 }
-
 
 void c_processing_options_dialog::reject()
 {

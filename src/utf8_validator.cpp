@@ -15,20 +15,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
-#include <Qt>
 #include <QDebug>
+#include <Qt>
 
 #include "utf8_validator.h"
 
-
 c_utf8_validator::c_utf8_validator(QObject *parent)
     : QValidator(parent)
-{
-}
+{}
 
-
-QValidator::State c_utf8_validator::validate(QString& text, int& ) const
+QValidator::State c_utf8_validator::validate(QString &text, int &) const
 {
     QValidator::State ret;
     if (text.toUtf8().length() <= 40) {

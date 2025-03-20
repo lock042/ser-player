@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef HEADER_DETAILS_DIALOG_H
 #define HEADER_DETAILS_DIALOG_H
 
@@ -23,7 +22,6 @@
 #include <cstdint>
 
 class QTextEdit;
-
 
 class c_header_details_dialog : public QDialog
 {
@@ -49,19 +47,15 @@ public:
                      uint64_t date_time_utc,
                      QString timestamp_info);
 
-
 signals:
-
 
 public slots:
 
-    
 private slots:
 
-    
 private:
     // Private methods
-    
+
     // Widgets
     QTextEdit *mp_header_details_Tedit;
 };

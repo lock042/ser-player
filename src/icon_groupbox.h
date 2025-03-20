@@ -2,8 +2,8 @@
 #define ICON_GROUPBOX_H
 
 #include <QGroupBox>
-#include <QLabel>
 #include <QHBoxLayout>
+#include <QLabel>
 
 class c_icon_groupbox : public QGroupBox
 {
@@ -22,7 +22,6 @@ private:
 signals:
 
 public slots:
-
 };
 
 #endif // ICON_GROUPBOX_H

@@ -18,18 +18,14 @@
 #ifndef PNG_WRITE_H
 #define PNG_WRITE_H
 
-
 #include <cstdint>
 #include <memory>
 
+extern int32_t save_png_file(const char *filename,
+                             const uint8_t *p_image_data,
+                             uint32_t width,
+                             uint32_t height,
+                             uint32_t bytes_per_sample,
+                             bool is_colour);
 
-extern int32_t save_png_file(
-    const char *filename,
-    const uint8_t *p_image_data,
-    uint32_t width,
-    uint32_t height,
-    uint32_t bytes_per_sample,
-    bool is_colour);
-
-    
-#endif  // PNG_WRITE_H
+#endif // PNG_WRITE_H

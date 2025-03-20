@@ -15,12 +15,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
 #include <QApplication>
-
 
 class c_ser_player;
 class QTranslator;
@@ -29,7 +27,7 @@ class c_application : public QApplication
 {
     Q_OBJECT
 public:
-    c_application(int & argc, char ** argv);
+    c_application(int &argc, char **argv);
     virtual ~c_application();
 
 protected:

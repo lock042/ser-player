@@ -132,7 +132,7 @@ TRANSLATIONS = translations/ser_player_da.ts \
                translations/ser_player_ja.ts
 
 # Make Mac version as backwards compatible with old OS versions as possible
-macx:QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+macx:QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
 # Remove standard function warnings on Windows
 win32:DEFINES += _CRT_SECURE_NO_WARNINGS

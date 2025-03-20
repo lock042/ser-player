@@ -15,13 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef UTF8_VALIDATOR_H
 #define UTF8_VALIDATOR_H
 
-#include <QValidator>
 #include <QString>
-
+#include <QValidator>
 
 class c_utf8_validator : public QValidator
 {
@@ -30,8 +28,7 @@ class c_utf8_validator : public QValidator
 public:
     c_utf8_validator(QObject *parent = 0);
 
-    QValidator::State validate(QString& input, int&) const;
+    QValidator::State validate(QString &input, int &) const;
 };
-
 
 #endif // UTF8_VALIDATOR_H

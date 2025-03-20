@@ -1,43 +1,37 @@
 #include "pipp_ser_write.h"
 #include "pipp_utf8.h"
 
-#include <cstdlib>
+#include <QDebug>
 #include <cstdint>
-#include <cstring>
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <QDebug>
 
 using namespace std;
-
 
 // ------------------------------------------
 // Constructor
 // ------------------------------------------
-c_pipp_ser_write::c_pipp_ser_write() :
-    mp_ser_file(nullptr),
-    m_open(false),
-    m_file_write_error(false)
+c_pipp_ser_write::c_pipp_ser_write()
+    : mp_ser_file(nullptr)
+    , m_open(false)
+    , m_file_write_error(false)
 {
     // Detect endianess of the processor
-    m_big_endian_processor = (*(uint16_t *)"\0\xff" < 0x100);
+    m_big_endian_processor = (*(uint16_t *) "\0\xff" < 0x100);
 
     // Clear header details
     memset(&m_header, 0, sizeof(s_ser_header));
 }
 
-
 // ------------------------------------------
 // Create a new SER file
 // ------------------------------------------
 bool c_pipp_ser_write::create(
-    const QString &filename,
-    int32_t  width,
-    int32_t  height,
-    bool     colour,
-    int32_t  byte_depth)
+    const QString &filename, int32_t width, int32_t height, bool colour, int32_t byte_depth)
 {
     // Set member variables
     m_width = width;
@@ -59,7 +53,7 @@ bool c_pipp_ser_write::create(
     if (!mp_ser_file) {
         return true;
     }
-    
+
     // Generate temp index filename
     int32_t filename_len = filename.length();
     mp_index_filename.reset(new char[filename_len + 5]);
@@ -78,10 +72,10 @@ bool c_pipp_ser_write::create(
     }
 
     // Write SER FILE ID to start of the file
-    fwrite_error_check("LUCAM-RECORDER" , 1 , 14 , mp_ser_file );
+    fwrite_error_check("LUCAM-RECORDER", 1, 14, mp_ser_file);
 
     // Write dummy header to file - to be overwritten later
-    fwrite_error_check(&m_header, 1, sizeof(s_ser_header), mp_ser_file );
+    fwrite_error_check(&m_header, 1, sizeof(s_ser_header), mp_ser_file);
 
     if (m_file_write_error) {
         // There were file errors, handle them
@@ -96,13 +90,10 @@ bool c_pipp_ser_write::create(
     return ret;
 }
 
-
 // ------------------------------------------
 // Write frame to SER file
 // ------------------------------------------
-bool c_pipp_ser_write::write_frame(
-    uint8_t *data,
-    uint64_t timestamp)
+bool c_pipp_ser_write::write_frame(uint8_t *data, uint64_t timestamp)
 {
     // Early return if the file is not open
     if (!m_open) {
@@ -122,17 +113,17 @@ bool c_pipp_ser_write::write_frame(
         uint8_t *write_ptr = p_buffer.get();
         uint8_t *read_ptr;
 
-        for (int32_t y = m_height-1; y >= 0; y--) {
+        for (int32_t y = m_height - 1; y >= 0; y--) {
             read_ptr = data + (y * m_width);
             memcpy(write_ptr, read_ptr, m_width);
             write_ptr += m_width;
         }
     } else if (m_bytes_per_sample == 2) {
         // 16-bit mono data write
-        uint16_t *write_ptr = (uint16_t *)p_buffer.get();
+        uint16_t *write_ptr = (uint16_t *) p_buffer.get();
         uint16_t *read_ptr;
-        uint16_t *data_16 = (uint16_t *)data;
-        for (int32_t y = m_height-1; y >= 0; y--) {
+        uint16_t *data_16 = (uint16_t *) data;
+        for (int32_t y = m_height - 1; y >= 0; y--) {
             read_ptr = data_16 + (y * m_width);
             memcpy(write_ptr, read_ptr, m_width * 2);
             write_ptr += m_width;
@@ -142,17 +133,17 @@ bool c_pipp_ser_write::write_frame(
         uint8_t *write_ptr = p_buffer.get();
         uint8_t *read_ptr;
 
-        for (int32_t y = m_height-1; y >= 0; y--) {
+        for (int32_t y = m_height - 1; y >= 0; y--) {
             read_ptr = data + (y * m_width * 3);
             memcpy(write_ptr, read_ptr, m_width * 3);
             write_ptr += m_width * 3;
         }
     } else if (m_bytes_per_sample == 6) {
         // 48-bit colour data
-        uint16_t *write_ptr = (uint16_t *)p_buffer.get();
+        uint16_t *write_ptr = (uint16_t *) p_buffer.get();
         uint16_t *read_ptr;
-        uint16_t *data_16 = (uint16_t *)data;
-        for (int32_t y = m_height-1; y >= 0; y--) {
+        uint16_t *data_16 = (uint16_t *) data;
+        for (int32_t y = m_height - 1; y >= 0; y--) {
             read_ptr = data_16 + y * m_width * 3;
             memcpy(write_ptr, read_ptr, m_width * 3 * 2);
             write_ptr += m_width * 3;
@@ -164,7 +155,7 @@ bool c_pipp_ser_write::write_frame(
 
     if (m_date_time_utc != 0) {
         if (m_big_endian_processor) {
-            timestamp = swap_endianess(timestamp);  // timestamp must be in little endian format
+            timestamp = swap_endianess(timestamp); // timestamp must be in little endian format
         }
 
         // Write timestamp to temp timestamp file
@@ -186,17 +177,15 @@ bool c_pipp_ser_write::write_frame(
     return ret;
 }
 
-
 // ------------------------------------------
 // Set details for SER file
 // ------------------------------------------
-bool c_pipp_ser_write::set_details(
-    int32_t lu_id,
-    int32_t colour_id,
-    int64_t utc_to_local_diff,
-    QString observer,
-    QString instrument,
-    QString telescope)
+bool c_pipp_ser_write::set_details(int32_t lu_id,
+                                   int32_t colour_id,
+                                   int64_t utc_to_local_diff,
+                                   QString observer,
+                                   QString instrument,
+                                   QString telescope)
 {
     m_header.lu_id = lu_id;
     m_header.little_endian = 0;
@@ -205,13 +194,13 @@ bool c_pipp_ser_write::set_details(
     if (!m_colour) {
         m_header.pixel_depth = 8 * m_bytes_per_sample;
         if (colour_id >= 0) {
-            m_header.colour_id = colour_id;  // Keep original colour_id from SER file
+            m_header.colour_id = colour_id; // Keep original colour_id from SER file
         } else {
-            m_header.colour_id = 0;  // There is no original colour_id
+            m_header.colour_id = 0; // There is no original colour_id
         }
     } else {
-        m_header.pixel_depth = (8 * m_bytes_per_sample) / 3; 
-        m_header.colour_id = COLOURID_BGR;  // We only support this value for colour files
+        m_header.pixel_depth = (8 * m_bytes_per_sample) / 3;
+        m_header.colour_id = COLOURID_BGR; // We only support this value for colour files
     }
 
     m_header.date_time = m_date_time_utc - utc_to_local_diff;
@@ -226,7 +215,6 @@ bool c_pipp_ser_write::set_details(
 
     return false;
 }
-
 
 // ------------------------------------------
 // Write header and close AVI file
@@ -248,7 +236,7 @@ bool c_pipp_ser_write::close()
             fseek64(mp_ser_index_file, 0, SEEK_SET);
 
             // Get buffer to store index in
-            std::unique_ptr<uint8_t[]> p_buffer(new uint8_t[(uint32_t)filesize]);
+            std::unique_ptr<uint8_t[]> p_buffer(new uint8_t[(uint32_t) filesize]);
 
             // Read data into buffer
             size_t read_size = fread(p_buffer.get(), 1, filesize, mp_ser_index_file);
@@ -256,7 +244,7 @@ bool c_pipp_ser_write::close()
 
             // Write index data to output file
             if (read_size == filesize) {
-                fwrite_error_check(p_buffer.get(), 1, (uint32_t)filesize, mp_ser_file);
+                fwrite_error_check(p_buffer.get(), 1, (uint32_t) filesize, mp_ser_file);
             }
 
             p_buffer.reset(nullptr);
@@ -270,14 +258,14 @@ bool c_pipp_ser_write::close()
 
         // Write header to file
         if (m_big_endian_processor) {
-            m_header.little_endian = 1;  // Note data is in big-endian format on big-endian systems
-            swap_header_endianess(&m_header);  // Header must be in little-endian format
+            m_header.little_endian = 1; // Note data is in big-endian format on big-endian systems
+            swap_header_endianess(&m_header); // Header must be in little-endian format
         }
 
-        fwrite_error_check(&m_header, 1, sizeof(s_ser_header), mp_ser_file );
+        fwrite_error_check(&m_header, 1, sizeof(s_ser_header), mp_ser_file);
 
         if (m_big_endian_processor) {
-            swap_header_endianess(&m_header);  // Reverse endianess change - probably not required!
+            swap_header_endianess(&m_header); // Reverse endianess change - probably not required!
         }
 
         // Note that the SER file is closed
@@ -295,20 +283,15 @@ bool c_pipp_ser_write::close()
     return ret;
 }
 
-
 // ------------------------------------------
 // fwrite() function with error checking
 // ------------------------------------------
 // ------------------------------------------
 // fwrite() function with error checking
 // ------------------------------------------
-void c_pipp_ser_write::fwrite_error_check(
-    const void *ptr,
-    size_t size,
-    size_t count,
-    FILE *p_stream)
+void c_pipp_ser_write::fwrite_error_check(const void *ptr, size_t size, size_t count, FILE *p_stream)
 {
-    if (!m_file_write_error) {  // Do not continue writing after an error has occured
+    if (!m_file_write_error) { // Do not continue writing after an error has occured
         size_t size_written = fwrite(ptr, size, count, p_stream);
         if (size_written != count) {
             m_file_write_error = true;

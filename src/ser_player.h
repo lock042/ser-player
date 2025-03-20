@@ -15,12 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef SER_PLAYER_H
 #define SER_PLAYER_H
 
-#include <QMainWindow>
 #include <QFile>
+#include <QMainWindow>
 #include <cstdint>
 
 class QAction;
@@ -42,7 +41,6 @@ class c_save_frames_dialog;
 class c_image_Widget;
 class c_image;
 class c_histogram_thread;
-
 
 class c_ser_player : public QMainWindow
 {
@@ -88,7 +86,7 @@ private:
     QPixmap m_no_file_open_Pixmap;
     c_image_Widget *mp_frame_image_Widget;
     QTimer *mp_frame_Timer;
-//    QTimer *mp_resize_Timer;
+    //    QTimer *mp_resize_Timer;
 
     QVBoxLayout *mp_main_vlayout;
 
@@ -112,7 +110,6 @@ private:
     int m_crop_height;
     int m_requested_zoom;
 
-
 public:
     c_ser_player(QWidget *parent = 0);
     ~c_ser_player();
@@ -135,7 +132,10 @@ public slots:
     void monochrome_conversion_changed_slot(bool enabled, int selection);
     void colour_balance_changed_slot(double red, double green, double blue);
     void estimate_colour_balance();
-    void colour_align_changed_slot(int red_align_x, int red_align_y, int blue_align_x, int blue_align_y);
+    void colour_align_changed_slot(int red_align_x,
+                                   int red_align_y,
+                                   int blue_align_x,
+                                   int blue_align_y);
     void zoom_changed_slot(QAction *);
     void language_changed_slot(QAction *);
     void open_ser_file_slot();
@@ -146,7 +146,7 @@ public slots:
     void save_frames_as_images_slot();
     void open_save_folder_slot(QAction *);
     void frame_timer_timeout_slot();
-//void resize_timer_timeout_slot();
+    //void resize_timer_timeout_slot();
     void frame_slider_changed_slot();
     void markers_dialog_closed_slot();
     void resize_window_100_percent_slot();
@@ -163,10 +163,9 @@ public slots:
     void stop_playing_slot();
     void playback_controls_double_clicked_slot();
 
-
 protected:
-//    virtual void resizeEvent(QResizeEvent *event);
-    virtual void changeEvent (QEvent *event);
+    //    virtual void resizeEvent(QResizeEvent *event);
+    virtual void changeEvent(QEvent *event);
 
 private:
     void add_string_to_stringlist(QStringList &string_list, QString string);

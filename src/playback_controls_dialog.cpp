@@ -17,13 +17,13 @@
 
 #include <QDebug>
 
-#include <Qt>
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QGuiApplication>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <Qt>
 
 #include "playback_controls_dialog.h"
-
 
 c_playback_controls_dialog::c_playback_controls_dialog(QWidget *parent)
     : QDialog(parent)
@@ -35,14 +35,14 @@ c_playback_controls_dialog::c_playback_controls_dialog(QWidget *parent)
 
     mp_dialog_vlayout = new QVBoxLayout;
     mp_dialog_vlayout->addWidget(mp_dummy_label);
-    mp_dialog_vlayout->setMargin(0);
+    mp_dialog_vlayout->setContentsMargins(0, 0, 0, 0);
     mp_dialog_vlayout->setSpacing(0);
-   
+
     setLayout(mp_dialog_vlayout);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
-void c_playback_controls_dialog::add_controls_widget(QWidget  *p_widget)
+void c_playback_controls_dialog::add_controls_widget(QWidget *p_widget)
 {
     mp_dummy_label->hide();
     mp_dialog_vlayout->removeWidget(mp_dummy_label);
@@ -50,8 +50,7 @@ void c_playback_controls_dialog::add_controls_widget(QWidget  *p_widget)
     show();
 }
 
-
-void c_playback_controls_dialog::remove_controls_widget(QWidget  *p_widget)
+void c_playback_controls_dialog::remove_controls_widget(QWidget *p_widget)
 {
     mp_dummy_label->show();
     mp_dialog_vlayout->removeWidget(p_widget);
@@ -59,17 +58,15 @@ void c_playback_controls_dialog::remove_controls_widget(QWidget  *p_widget)
     hide();
 }
 
-
 void c_playback_controls_dialog::move_to_default_position()
 {
-    QDesktopWidget widget;
-    int screen_right_edge = widget.availableGeometry().right();
+    QScreen *screen = QGuiApplication::primaryScreen();
+    int screen_right_edge = screen->availableGeometry().right();
     QPoint playback_pos = parentWidget()->geometry().bottomRight();
     playback_pos.setY(playback_pos.y() - frameGeometry().height());
     if ((playback_pos.x() + frameGeometry().width()) > screen_right_edge) {
         int new_x = screen_right_edge - frameGeometry().width();
         playback_pos.setX(new_x);
     }
-
     move(playback_pos);
 }

@@ -17,11 +17,13 @@
 
 #include <Qt>
 #include <QApplication>
+#include <QActionGroup>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
 #include <QDesktopServices>
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QGuiApplication>
 #include <QDragEnterEvent>
 #include <QFileDialog>
 #include <QFuture>
@@ -360,7 +362,7 @@ c_ser_player::c_ser_player(QWidget *parent)
             lang = tr("Latvian"); break;
             case QLocale::Lithuanian:  //: Language name
             lang = tr("Lithuanian"); break;
-            case QLocale::Norwegian:  //: Language name
+            case QLocale::NorwegianBokmal:  //: Language name
             lang = tr("Norwegian"); break;
             case QLocale::Polish:  //: Language name
             lang = tr("Polish"); break;
@@ -429,7 +431,7 @@ c_ser_player::c_ser_player(QWidget *parent)
 
     mp_main_vlayout = new QVBoxLayout;
     mp_main_vlayout->setSpacing(0);
-    mp_main_vlayout->setMargin(0);
+    mp_main_vlayout->setContentsMargins(0, 0, 0, 0);
     mp_main_vlayout->addWidget(mp_frame_image_Widget, 2);
     mp_main_vlayout->addWidget(mp_playback_controls_widget);
 
@@ -648,19 +650,17 @@ void c_ser_player::detach_playback_controls_slot(bool detach)
         mp_main_vlayout->insertWidget(1, mp_playback_controls_widget);
     }
 
-    // Resize window to allow for removed/adde controls
+    // Resize window to allow for removed/added controls
     if (windowState() != Qt::WindowMaximized) {
         QSize new_size = size();
         new_size.setHeight(new_size.height() + delta_height);
-
         QSize frame_border_and_title_size = frameSize() - size();
-        QDesktopWidget widget;
-        QSize available_desktop_size = widget.availableGeometry().size() - frame_border_and_title_size;
+        QScreen *screen = QGuiApplication::primaryScreen();
+        QSize available_desktop_size = screen->availableGeometry().size() - frame_border_and_title_size;
         if (new_size.height() > available_desktop_size.height())
         {
             new_size.setHeight(available_desktop_size.height());
         }
-
         resize(new_size);
     }
 
@@ -820,7 +820,7 @@ void c_ser_player::save_frames_as_ser_slot()
         }
 
         QString selected_filter;
-        QFileDialog::Options save_dialog_options = 0;
+        QFileDialog::Options save_dialog_options;
         #ifdef __APPLE__
         // The native save file dialog on OS X does not fill out a default filename
         // so we use QT's save file dialog instead
@@ -1044,7 +1044,7 @@ void c_ser_player::save_frames_as_avi_slot()
         }
 
         QString selected_filter;
-        QFileDialog::Options save_dialog_options = 0;
+        QFileDialog::Options save_dialog_options;
         #ifdef __APPLE__
         // The native save file dialog on OS X does not fill out a default filename
         // so we use QT's save file dialog instead
@@ -1298,7 +1298,7 @@ void c_ser_player::save_frames_as_gif_slot()
             } else {
                 // This is a real save, not a test run
                 QString selected_filter;
-                QFileDialog::Options save_dialog_options = 0;
+                QFileDialog::Options save_dialog_options;
                 #ifdef __APPLE__
                 // The native save file dialog on OS X does not fill out a default filename
                 // so we use QT's save file dialog instead
@@ -1470,41 +1470,41 @@ void c_ser_player::save_frames_as_gif_slot()
                     if (temp_html_file.open()) {
                         temp_html_file.resize(0);  // Clear any file contents
                         QTextStream stream(&temp_html_file);
-                        stream << "<!DOCTYPE html>" << endl;
-                        stream << "<html>" << endl;
-                        stream << "<body>" << endl;
-                        stream << "<p>" << endl;
-                        stream << "<table><tr><td>" << endl;
-                        stream << "<b><big>" << tr("SER Player Animated GIF Review") << "</big></b><br>" << endl;
-                        stream << "<b>" << tr("(Close browser when reviewing is complete)") << " </b><br>" << endl;
+                        stream << "<!DOCTYPE html>" << Qt::endl;
+                        stream << "<html>" << Qt::endl;
+                        stream << "<body>" << Qt::endl;
+                        stream << "<p>" << Qt::endl;
+                        stream << "<table><tr><td>" << Qt::endl;
+                        stream << "<b><big>" << tr("SER Player Animated GIF Review") << "</big></b><br>" << Qt::endl;
+                        stream << "<b>" << tr("(Close browser when reviewing is complete)") << " </b><br>" << Qt::endl;
 
-                        stream << tr("Frame Delay: ") << mp_save_frames_as_gif_Dialog->get_gif_frametime() << " s<br>" << endl;
-                        stream << tr("Final Frame Delay: ") << mp_save_frames_as_gif_Dialog->get_gif_final_frametime() << " s<br>" << endl;
+                        stream << tr("Frame Delay: ") << mp_save_frames_as_gif_Dialog->get_gif_frametime() << " s<br>" << Qt::endl;
+                        stream << tr("Final Frame Delay: ") << mp_save_frames_as_gif_Dialog->get_gif_final_frametime() << " s<br>" << Qt::endl;
 
-                        stream << tr("Colour Quantisation: ") << mp_save_frames_as_gif_Dialog->get_gif_colour_quantisation_name() << "<br>" << endl;
+                        stream << tr("Colour Quantisation: ") << mp_save_frames_as_gif_Dialog->get_gif_colour_quantisation_name() << "<br>" << Qt::endl;
 
-                        stream << tr("Unchanged Border Tolerance: ") << unchanged_border_tolerance << "<br>" << endl;
+                        stream << tr("Unchanged Border Tolerance: ") << unchanged_border_tolerance << "<br>" << Qt::endl;
 
                         if (transparent_pixel_enable) {
-                            stream << tr("Transperant Pixel Tolerance: ") << transparent_pixel_tolerence << "<br>" << endl;
+                            stream << tr("Transperant Pixel Tolerance: ") << transparent_pixel_tolerence << "<br>" << Qt::endl;
                         } else {
-                            stream << tr("Transperant Pixel Tolerance: Disabled") << "<br>" << endl;
+                            stream << tr("Transperant Pixel Tolerance: Disabled") << "<br>" << Qt::endl;
                         }
 
                         if (pixel_depth < 8) {
-                            stream << tr("Reduced Pixel Depth: ") << pixel_depth << "<br>" << endl;
+                            stream << tr("Reduced Pixel Depth: ") << pixel_depth << "<br>" << Qt::endl;
                         } else {
-                            stream << tr("Reduced Pixel Depth: Disabled") << "<br>" << endl;
+                            stream << tr("Reduced Pixel Depth: Disabled") << "<br>" << Qt::endl;
                         }
 
                         if (lossy_compression_level > 0) {
-                            stream << tr("Lossy Compression Level: ") << lossy_compression_level << "<br>" << endl;
+                            stream << tr("Lossy Compression Level: ") << lossy_compression_level << "<br>" << Qt::endl;
                         } else {
-                            stream << tr("Lossy Compression Level: Disabled") << "<br>" << endl;
+                            stream << tr("Lossy Compression Level: Disabled") << "<br>" << Qt::endl;
                         }
 
-                        stream << "<hr>" << endl;
-                        stream << "<b>" << tr("Frames Saved: %1 of %2").arg(written_framecount).arg(frames_to_be_saved) << "</b><br>" << endl;
+                        stream << "<hr>" << Qt::endl;
+                        stream << "<b>" << tr("Frames Saved: %1 of %2").arg(written_framecount).arg(frames_to_be_saved) << "</b><br>" << Qt::endl;
 
                         uint32_t filesize;
                         if (written_framecount < frames_to_be_saved) {
@@ -1522,33 +1522,33 @@ void c_ser_player::save_frames_as_gif_slot()
                             double filesize_mb = (double)filesize / (1024 * 1024);
                             filesize_mb = (floor(filesize_mb * 100)) / 100;  // Round to 2 decimal places
                             if (written_framecount < frames_to_be_saved) {
-                                stream << "<b>" << tr("Estimated Filesize: %1 MB (%2 Bytes)").arg(filesize_mb).arg(filesize) << "</b><br>" << endl;
+                                stream << "<b>" << tr("Estimated Filesize: %1 MB (%2 Bytes)").arg(filesize_mb).arg(filesize) << "</b><br>" << Qt::endl;
                             } else {
 
-                                stream << "<b>" << tr("Filesize: %1 MB (%2 Bytes)").arg(filesize_mb).arg(filesize) << "</b><br>" << endl;
+                                stream << "<b>" << tr("Filesize: %1 MB (%2 Bytes)").arg(filesize_mb).arg(filesize) << "</b><br>" << Qt::endl;
                             }
                         } else if (filesize > 1024) {
                            double filesize_kb = (double)filesize / 1024;
                            filesize_kb = (floor(filesize_kb * 100)) / 100;  // Round to 2 decimal places
                            if (written_framecount < frames_to_be_saved) {
-                               stream << "<b>" << tr("Estimated Filesize: %1 KB (%2 Bytes)").arg(filesize_kb).arg(filesize) << "</b><br>" << endl;
+                               stream << "<b>" << tr("Estimated Filesize: %1 KB (%2 Bytes)").arg(filesize_kb).arg(filesize) << "</b><br>" << Qt::endl;
                            } else {
-                               stream << "<b>" << tr("Filesize: %1 KB (%2 Bytes)").arg(filesize_kb).arg(filesize) << "</b><br>" << endl;
+                               stream << "<b>" << tr("Filesize: %1 KB (%2 Bytes)").arg(filesize_kb).arg(filesize) << "</b><br>" << Qt::endl;
                            }
                         } else {
                             if (written_framecount < frames_to_be_saved) {
-                                stream << "<b>" << tr("Estimated Filesize: %1 Bytes").arg(filesize) << "</b><br>" << endl;
+                                stream << "<b>" << tr("Estimated Filesize: %1 Bytes").arg(filesize) << "</b><br>" << Qt::endl;
                             } else {
-                                stream << "<b>" << tr("Filesize: %1 Bytes").arg(filesize) << "</b><br>" << endl;
+                                stream << "<b>" << tr("Filesize: %1 Bytes").arg(filesize) << "</b><br>" << Qt::endl;
                             }
                         }
 
-                        stream << "</td></tr></table>" << endl;
-                        stream << "</p>" << endl;
-                        stream << "<img src=\"file:///" << temp_gif_filename << "\">" << endl;
+                        stream << "</td></tr></table>" << Qt::endl;
+                        stream << "</p>" << Qt::endl;
+                        stream << "<img src=\"file:///" << temp_gif_filename << "\">" << Qt::endl;
 
-                        stream << "</body>" << endl;
-                        stream << "</html>" << endl;
+                        stream << "</body>" << Qt::endl;
+                        stream << "</html>" << Qt::endl;
                         temp_html_file.close();
                     }
 
@@ -2206,11 +2206,11 @@ void c_ser_player::open_ser_file(const QString &filename)
         resize_window_100_percent_slot();
 
         // Move the application to the middle of the screen
-        int x_offset = QApplication::desktop()->availableGeometry().size().width() - frameSize().width();
+        int x_offset = QGuiApplication::primaryScreen()->availableGeometry().size().width() - frameSize().width();
         x_offset /= 2;
-        int y_offset = QApplication::desktop()->availableGeometry().size().height() - frameSize().height();
+        int y_offset = QGuiApplication::primaryScreen()->availableGeometry().size().height() - frameSize().height();
         y_offset /= 2;
-        QPoint new_window_pos = QApplication::desktop()->availableGeometry().topLeft();
+        QPoint new_window_pos = QGuiApplication::primaryScreen()->availableGeometry().topLeft();
         new_window_pos.setX(new_window_pos.x() + x_offset);
         new_window_pos.setY(new_window_pos.y() + y_offset);
         move(new_window_pos);
@@ -2228,14 +2228,13 @@ void c_ser_player::open_ser_file(const QString &filename)
 void c_ser_player::set_defaut_histogram_position()
 {
     // Move the histogram to the top-right(ish) of the application window
-    QDesktopWidget widget;
-    int available_width = widget.availableGeometry().size().width();
+    QScreen *screen = QGuiApplication::primaryScreen();
+    int available_width = screen->availableGeometry().size().width();
     QPoint histogram_pos = geometry().topRight();
     if ((histogram_pos.x() + mp_histogram_dialog->frameGeometry().width()) > available_width) {
         int new_x = available_width - mp_histogram_dialog->frameGeometry().width();
         histogram_pos.setX(new_x);
     }
-
     mp_histogram_dialog->move(histogram_pos);
 }
 
@@ -2323,32 +2322,25 @@ void c_ser_player::resize_window_with_zoom(int zoom)
 {
     m_requested_zoom = zoom;
     QSize frame_border_and_title_size = frameSize() - size();
-    QDesktopWidget widget;
-    QSize available_desktop_size = widget.availableGeometry().size() - frame_border_and_title_size;
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QSize available_desktop_size = screen->availableGeometry().size() - frame_border_and_title_size;
     QSize widget_outside_image_size = size() - mp_frame_image_Widget->size();
-
     // Calculate size of zoomed image
     QSize zoomed_image_size = (mp_frame_image_Widget->get_image_size() * zoom) / 100;
-
     // Calculate application size without frame border and title
     QSize new_widget_size = zoomed_image_size + widget_outside_image_size;
-
     // Check that the application size is not larger than the available desktop size
     QSize oversize_error = QSize(0, 0);
     if (new_widget_size.width() > available_desktop_size.width()) {
         oversize_error.setWidth(new_widget_size.width() - available_desktop_size.width());
     }
-
     if (new_widget_size.height() > available_desktop_size.height()) {
         oversize_error.setHeight(new_widget_size.height() - available_desktop_size.height());
     }
-
     // Recalculate size of zoomed image to fit on available desktop size
     zoomed_image_size.scale(zoomed_image_size - oversize_error, Qt::KeepAspectRatio);
-
     // Recalculate application size without frame border and title
     new_widget_size = zoomed_image_size + widget_outside_image_size;
-
     showNormal();  // Ensure window is not maximised
     resize(new_widget_size);  // Resize the application
 }
@@ -2487,7 +2479,7 @@ void c_ser_player::create_no_file_open_image()
     while(true) {
         font.setPixelSize(pixel_size);
         QFontMetrics fm(font);
-        int text_width = fm.width(no_file_open_string);
+        int text_width = fm.horizontalAdvance(no_file_open_string);
         if (text_width > (pic_width * 9) / 10) {
             font.setPixelSize(last_pixel_size);
             break;
@@ -2499,7 +2491,7 @@ void c_ser_player::create_no_file_open_image()
 
     // Draw text on image
     QFontMetrics fm(font);
-    int no_ser_text_width = fm.width(no_file_open_string);
+    int no_ser_text_width = fm.horizontalAdvance(no_file_open_string);
 
     QPainter painter(&m_no_file_open_Pixmap);
     painter.setPen(Qt::white);
@@ -2522,7 +2514,7 @@ void c_ser_player::create_no_file_open_image()
         while(true) {
             font.setPixelSize(pixel_size);
             QFontMetrics fm(font);
-            int text_width = fm.width(new_version_text);
+            int text_width = fm.horizontalAdvance(new_version_text);
             if (text_width > (pic_width * 98) / 100) {
                 font.setPixelSize(last_pixel_size);
                 break;
@@ -2535,7 +2527,7 @@ void c_ser_player::create_no_file_open_image()
         // Draw text on image
         font.setPixelSize(new_ver_pixel_size);
         QFontMetrics fm(font);
-        int new_ver_text_width = fm.width(new_version_text);
+        int new_ver_text_width = fm.horizontalAdvance(new_version_text);
         int new_ver_text_height = fm.height();
         painter.setPen(Qt::yellow);
         painter.setFont(font);
@@ -2547,7 +2539,7 @@ void c_ser_player::create_no_file_open_image()
         while(true) {
             font.setPixelSize(pixel_size);
             QFontMetrics fm(font);
-            int text_width = fm.width(download_from_text);
+            int text_width = fm.horizontalAdvance(download_from_text);
             if (text_width > (pic_width * 98) / 100) {
                 font.setPixelSize(last_pixel_size);
                 break;
@@ -2560,7 +2552,7 @@ void c_ser_player::create_no_file_open_image()
         // Draw text on image
         font.setPixelSize(download_from_pixel_size);
         QFontMetrics fm2(font);
-        int download_from_text_width = fm2.width(download_from_text);
+        int download_from_text_width = fm2.horizontalAdvance(download_from_text);
         int download_from_text_height = fm2.height();
         painter.setPen(Qt::yellow);
         painter.setFont(font);

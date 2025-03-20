@@ -1,25 +1,22 @@
 #include "pipp_avi_write_dib.h"
 #include "pipp_utf8.h"
-#include <cstdlib>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
-#include <cstdint>
 #include <sstream>
 
 #define MONO_DATA_TIGHTLY_PACKED 1
 
-
 // ------------------------------------------
 // Constructor
 // ------------------------------------------
-c_pipp_avi_write_dib::c_pipp_avi_write_dib() :
-  m_line_gap(0)
+c_pipp_avi_write_dib::c_pipp_avi_write_dib()
+    : m_line_gap(0)
 {
-    m_vids_stream_header.handler.u32 = FCC_DIB;  // Override value from base class
-    m_bitmap_info_header.compression.u32 = 0;  // No compression
+    m_vids_stream_header.handler.u32 = FCC_DIB; // Override value from base class
+    m_bitmap_info_header.compression.u32 = 0;   // No compression
 }
-
 
 // ------------------------------------------
 // Set codec specific values
@@ -43,24 +40,19 @@ int32_t c_pipp_avi_write_dib::set_codec_values()
     return 0;
 }
 
-
 // ------------------------------------------
 // Write frame to AVI file
 // ------------------------------------------
-bool c_pipp_avi_write_dib::write_frame(
-    uint8_t  *data,
-    int32_t colour,
-    uint32_t bpp,
-    void *extra_data)
+bool c_pipp_avi_write_dib::write_frame(uint8_t *data, int32_t colour, uint32_t bpp, void *extra_data)
 {
     // Remove unused argument warnings
-    (void)extra_data;
+    (void) extra_data;
 
     // Early return if no file is open
     if (!m_open) {
         return true;
     }
-    
+
     if (colour < 0 || colour > 2) {
         colour = 0;
     }
@@ -87,11 +79,11 @@ bool c_pipp_avi_write_dib::write_frame(
         buffer = data;
     } else {
         // Create version of image with line gaps in
-        buffer = m_temp_buffer.get_buffer((m_width * m_bytes_per_pixel + m_line_gap)* m_height);
-        
+        buffer = m_temp_buffer.get_buffer((m_width * m_bytes_per_pixel + m_line_gap) * m_height);
+
         if (bpp == 1) {
             if (m_bytes_per_pixel == 3) {
-                // Colour version 
+                // Colour version
                 for (int32_t y = 0; y < m_height; y++) {
                     uint8_t *src_ptr = data + (y * line_length);
                     uint8_t *dst_ptr = buffer + (y * (line_length + m_line_gap));
@@ -114,11 +106,11 @@ bool c_pipp_avi_write_dib::write_frame(
                     dst_ptr += m_line_gap;
                 }
             }
-        } else {  // Bytes per sample == 2
+        } else { // Bytes per sample == 2
             if (m_bytes_per_pixel == 3) {
-                // Colour version 
+                // Colour version
                 for (int32_t y = 0; y < m_height; y++) {
-                    uint16_t *src_ptr = (uint16_t *)data + (y * line_length);
+                    uint16_t *src_ptr = (uint16_t *) data + (y * line_length);
                     uint8_t *dst_ptr = buffer + (y * (line_length + m_line_gap));
                     for (int32_t x = 0; x < line_length; x++) {
                         *dst_ptr++ = *src_ptr++ >> 8;
@@ -126,7 +118,7 @@ bool c_pipp_avi_write_dib::write_frame(
                 }
             } else {
                 // Mono version
-                uint16_t *src_ptr = (uint16_t *)data + colour;
+                uint16_t *src_ptr = (uint16_t *) data + colour;
                 uint8_t *dst_ptr = buffer;
                 for (int32_t y = 0; y < m_height; y++) {
                     for (int32_t x = 0; x < m_width; x++) {
@@ -145,8 +137,11 @@ bool c_pipp_avi_write_dib::write_frame(
     }
 
     // Write image data to file
-    m_last_frame_pos = ftell64(mp_avi_file);  // Grab position of last file
-    fwrite_error_check(buffer , 1 , (m_width * m_bytes_per_pixel + m_line_gap) * m_height, mp_avi_file);
+    m_last_frame_pos = ftell64(mp_avi_file); // Grab position of last file
+    fwrite_error_check(buffer,
+                       1,
+                       (m_width * m_bytes_per_pixel + m_line_gap) * m_height,
+                       mp_avi_file);
 
     // Tidy up after write failures
     if (m_file_write_error) {

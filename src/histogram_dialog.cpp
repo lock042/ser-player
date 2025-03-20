@@ -17,16 +17,16 @@
 
 #include <QDebug>
 
-#include <Qt>
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QGuiApplication>
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <Qt>
 
 #include "histogram_dialog.h"
-
 
 c_histogram_dialog::c_histogram_dialog(QWidget *parent)
     : QDialog(parent)
@@ -39,30 +39,27 @@ c_histogram_dialog::c_histogram_dialog(QWidget *parent)
 
     QVBoxLayout *dialog_vlayout = new QVBoxLayout;
     dialog_vlayout->addWidget(mp_histogram_Label);
-    dialog_vlayout->setMargin(0);
+    dialog_vlayout->setContentsMargins(0, 0, 0, 0);
     dialog_vlayout->setSpacing(0);
-   
+
     setLayout(dialog_vlayout);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
-
 
 void c_histogram_dialog::set_pixmap(QPixmap histogram)
 {
     mp_histogram_Label->setPixmap(histogram);
 }
 
-
 void c_histogram_dialog::move_to_default_position()
 {
     // Move the histogram to the top-right(ish) of the application window
-    QDesktopWidget widget;
-    int screen_right_edge = widget.availableGeometry().right();
+    QScreen *screen = QGuiApplication::primaryScreen();
+    int screen_right_edge = screen->availableGeometry().right();
     QPoint histogram_pos = parentWidget()->geometry().topRight();
     if ((histogram_pos.x() + frameGeometry().width()) > screen_right_edge) {
         int new_x = screen_right_edge - frameGeometry().width();
         histogram_pos.setX(new_x);
     }
-
     move(histogram_pos);
 }

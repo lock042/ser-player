@@ -15,68 +15,61 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
-#include <QDateTime>
-#include <QUrl>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QMessageBox>
-#include <QDebug>
 #include "new_version_checker.h"
+#include <QDateTime>
+#include <QDebug>
+#include <QMessageBox>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QUrl>
 #include "persistent_data.h"
 
-c_new_version_checker::c_new_version_checker(QObject *parent, QString version) :
-    QObject(parent),
-    m_version(version)
+c_new_version_checker::c_new_version_checker(QObject *parent, QString version)
+    : QObject(parent)
+    , m_version(version)
 {
     net_access_manager = new QNetworkAccessManager(this);
-    connect(net_access_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finished(QNetworkReply*)));
+    connect(net_access_manager,
+            SIGNAL(finished(QNetworkReply *)),
+            this,
+            SLOT(finished(QNetworkReply *)));
 }
-
 
 void c_new_version_checker::check()
 {
-    const uint secs_between_update_checks = 12 * 60 * 60;  // 12 hours minimum between update checks
-    uint current_time = QDateTime::currentDateTime().toTime_t();
+    const uint secs_between_update_checks = 12 * 60 * 60; // 12 hours minimum between update checks
+    uint current_time = QDateTime::currentDateTime().toSecsSinceEpoch();
     if (current_time > c_persistent_data::m_last_ver_check_time + secs_between_update_checks) {
-        net_access_manager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/cgarry/ser-player/master/latest_version.txt")));
+        net_access_manager->get(QNetworkRequest(
+            QUrl("https://raw.githubusercontent.com/cgarry/ser-player/master/latest_version.txt")));
     }
 }
-
 
 void c_new_version_checker::finished(QNetworkReply *reply)
 {
     int http_status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-//    qDebug() << "c_new_version_checker: http_status" << http_status;
-    if (http_status == 301 || http_status == 302  || http_status == 302)
-    {
+    //    qDebug() << "c_new_version_checker: http_status" << http_status;
+    if (http_status == 301 || http_status == 302 || http_status == 303) {
         // Handle redirect
-        net_access_manager->get(QNetworkRequest(QUrl(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString())));
+        net_access_manager->get(QNetworkRequest(
+            QUrl(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString())));
         return;
-    }
-    else if (http_status == 200)
-    {
+    } else if (http_status == 200) {
         // Grab time of update check
-        c_persistent_data::m_last_ver_check_time = QDateTime::currentDateTime().toTime_t();
-
+        c_persistent_data::m_last_ver_check_time = QDateTime::currentDateTime().toSecsSinceEpoch();
         // Get the received file in a string
         QString rxd_file(reply->readAll());
         rxd_file.remove("\r");
-
         // Spilt the file into lines
         QStringList rxd_lines = rxd_file.split("\n");
-
         // Check if new version is newer than current version
         bool new_version_available = compare_version_strings(m_version, rxd_lines[0]);
-
         if (new_version_available) {
             new_version_available_signal(rxd_lines[0]);
         }
     }
-
     this->deleteLater();
 }
-
 
 bool c_new_version_checker::compare_version_strings(QString current_version, QString new_version)
 {
@@ -111,8 +104,7 @@ bool c_new_version_checker::compare_version_strings(QString current_version, QSt
     return new_version_is_newer;
 }
 
-
-QString c_new_version_checker::rstrip(const QString& str)
+QString c_new_version_checker::rstrip(const QString &str)
 {
     int n = str.size() - 1;
     for (; n >= 0; --n) {
@@ -124,8 +116,9 @@ QString c_new_version_checker::rstrip(const QString& str)
     return "";
 }
 
-QList<int> c_new_version_checker::get_version_from_string(const QString &ver_string) {
-    QList<int> ret;  // Empty list
+QList<int> c_new_version_checker::get_version_from_string(const QString &ver_string)
+{
+    QList<int> ret; // Empty list
 
     // Extract new version number
     QStringList version = ver_string.split(".");

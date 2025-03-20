@@ -15,14 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef HISTOGRAM_DIALOG_H
 #define HISTOGRAM_DIALOG_H
 
 #include <QDialog>
 
 class QLabel;
-
 
 class c_histogram_dialog : public QDialog
 {
@@ -33,17 +31,13 @@ public:
     void set_pixmap(QPixmap histogram);
     void move_to_default_position();
 
-
 signals:
-
 
 public slots:
 
-    
 private slots:
 
-    
-private:    
+private:
     // Widgets
     QLabel *mp_histogram_Label;
 };

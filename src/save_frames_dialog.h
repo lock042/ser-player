@@ -15,13 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef SAVE_FRAMES_DIALOG_H
 #define SAVE_FRAMES_DIALOG_H
 
 #include <QDialog>
 #include <QString>
-
 
 class QRadioButton;
 class QDoubleSpinBox;
@@ -33,13 +31,12 @@ class QCheckBox;
 class QComboBox;
 class c_utf8_validator;
 
-
 class c_save_frames_dialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    enum e_save_type {SAVE_IMAGES, SAVE_SER, SAVE_AVI, SAVE_GIF};
+    enum e_save_type { SAVE_IMAGES, SAVE_SER, SAVE_AVI, SAVE_GIF };
 
     c_save_frames_dialog(QWidget *parent,
                          e_save_type save_type,
@@ -54,17 +51,13 @@ public:
 
     ~c_save_frames_dialog();
 
-    void set_markers(int marker_start_frame,
-                     int marker_end_frame,
-                     bool markers_enabled);
+    void set_markers(int marker_start_frame, int marker_end_frame, bool markers_enabled);
 
-    void set_processed_frame_size(int frame_width,
-                                  int frame_height);
+    void set_processed_frame_size(int frame_width, int frame_height);
 
     void set_gif_frametime(double frametime);
 
-    void set_colour_details(bool is_colour_raw,
-                            bool is_colour_processed);
+    void set_colour_details(bool is_colour_raw, bool is_colour_processed);
 
     int get_active_width();
     int get_active_height();
@@ -79,20 +72,11 @@ public:
     QString get_gif_colour_quantisation_name();
     int get_gif_pixel_bit_depth();
     int get_gif_lossy_compression_level();
-    bool get_gif_test_run()
-    {
-        return m_test_run;
-    }
+    bool get_gif_test_run() { return m_test_run; }
 
-    int get_start_frame()
-    {
-        return m_start_frame;
-    }
+    int get_start_frame() { return m_start_frame; }
 
-    int get_end_frame()
-    {
-        return m_end_frame;
-    }
+    int get_end_frame() { return m_end_frame; }
 
     int get_frame_decimation();
     int get_sequence_direction();
@@ -112,19 +96,11 @@ public:
     int get_avi_max_size();
 
     // Last save directory
-    void set_last_save_directory(QString dir)
-    {
-        m_last_save_dir = dir;
-    }
+    void set_last_save_directory(QString dir) { m_last_save_dir = dir; }
 
-    QString get_last_save_directory()
-    {
-        return m_last_save_dir;
-    }
-
+    QString get_last_save_directory() { return m_last_save_dir; }
 
 signals:
-
 
 private slots:
     void spinbox_changed_slot();
@@ -134,17 +110,16 @@ private slots:
     void gif_apply_preset_options();
     void gif_unchanged_border_tolerance_changed_slot();
     void gif_test_options_button_pressed_slot();
-//    void multiple_files_frames_changed_slot();
-//    void multiple_files_files_changed_slot();
-//    void multiple_files_overlap_frames_changed_slot();
+    //    void multiple_files_frames_changed_slot();
+    //    void multiple_files_files_changed_slot();
+    //    void multiple_files_overlap_frames_changed_slot();
 
-    
 private:
     // Private methods
     void helper_method();
     void colour_updated();
     bool is_select_radio_button_checked();
-    
+
     // Widgets
     QRadioButton *mp_save_current_frame_RButton;
     QRadioButton *mp_save_all_frames_RButton;
@@ -153,7 +128,7 @@ private:
     QSpinBox *mp_start_Spinbox;
     QSpinBox *mp_end_Spinbox;
     QLabel *mp_selected_frames_Label;
-/*
+    /*
     QSpinBox *mp_multiple_files_frames_Spinbox;
     QSpinBox *mp_multiple_files_files_Spinbox;
     QGroupBox *mp_save_multiple_files_GBox;
@@ -206,7 +181,6 @@ private:
     QCheckBox *mp_gif_reduce_pixel_depth_CBox;
     QSpinBox *mp_gif_reduce_pixel_depth_SpinBox;
 
-
     QLabel *mp_total_frames_to_save_Label;
 
     c_utf8_validator *mp_utf8_validator;
@@ -229,10 +203,10 @@ private:
     int m_end_frame;
     int m_total_selected_frames;
     bool m_frame_start_end_spin_boxes_valid;
-//    bool m_multiple_files_spin_boxes_valid;
+    //    bool m_multiple_files_spin_boxes_valid;
     bool m_test_run;
     QString m_last_save_dir;
-//    bool m_multiple_files_by_frames;
+    //    bool m_multiple_files_by_frames;
 };
 
 #endif // SAVE_FRAMES_DIALOG_H

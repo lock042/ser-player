@@ -15,24 +15,19 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
+#include "pipp_utf8.h"
 #include <Windows.h>
 #include <cstdio>
-#include <cwchar>
 #include <cstring>
+#include <cwchar>
 #include <iostream>
-#include "pipp_utf8.h"
-
 
 using namespace std;
-
 
 // ------------------------------------------
 // fopen_utf8
 // ------------------------------------------
-FILE *fopen_utf8(
-    const std::string &filename,
-	const std::string &mode)
+FILE *fopen_utf8(const std::string &filename, const std::string &mode)
 {
     // Convert filename from utf-8 to wchat_t
     int length = MultiByteToWideChar(CP_UTF8, 0, filename.c_str(), -1, 0, 0);
@@ -48,19 +43,16 @@ FILE *fopen_utf8(
     FILE *ret = _wfopen(w_fname, w_mode);
 
     // Delete string buffers
-    delete [] w_fname;
-    delete [] w_mode;
+    delete[] w_fname;
+    delete[] w_mode;
 
     return ret;
 }
 
-
 // ------------------------------------------
 // rename_utf8
 // ------------------------------------------
-int rename_utf8( 
-   const std::string &oldname, 
-   const std::string &newname)
+int rename_utf8(const std::string &oldname, const std::string &newname)
 {
     int length;
 
@@ -78,18 +70,16 @@ int rename_utf8(
     int ret = _wrename(w_oldname, w_newname);
 
     // Delete string buffers
-    delete [] w_oldname;
-    delete [] w_newname;
+    delete[] w_oldname;
+    delete[] w_newname;
 
     return ret;
 }
 
-
 // ------------------------------------------
 // remove_utf8
 // ------------------------------------------
-int remove_utf8( 
-   const std::string &path)
+int remove_utf8(const std::string &path)
 {
     int length;
 
@@ -100,18 +90,15 @@ int remove_utf8(
 
     int ret = _wremove(w_path);
 
-    delete [] w_path;
+    delete[] w_path;
 
     return ret;
 }
 
-
 // ------------------------------------------
 // copy_file_utf8
 // ------------------------------------------
-bool copy_file_utf8(
-   const std::string &oldname, 
-   const std::string &newname)
+bool copy_file_utf8(const std::string &oldname, const std::string &newname)
 {
     int length;
 
@@ -125,24 +112,19 @@ bool copy_file_utf8(
     wchar_t *w_newname = new wchar_t[length];
     MultiByteToWideChar(CP_UTF8, 0, newname.c_str(), -1, w_newname, length);
 
-    int ret = CopyFileW(
-        w_oldname,
-        w_newname,
-        false);
+    int ret = CopyFileW(w_oldname, w_newname, false);
 
     // Delete string buffers
-    delete [] w_oldname;
-    delete [] w_newname;
+    delete[] w_oldname;
+    delete[] w_newname;
 
     return ret != 0;
 }
 
-
 // ------------------------------------------
 // is_dirctory_utf8
 // ------------------------------------------
-bool is_directory_utf8(
-    const std::string &path)
+bool is_directory_utf8(const std::string &path)
 {
     int length;
 
@@ -152,7 +134,7 @@ bool is_directory_utf8(
     MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, w_path, length);
 
     DWORD ret = GetFileAttributesW(w_path);
-    delete [] w_path;
+    delete[] w_path;
 
     if (ret == INVALID_FILE_ATTRIBUTES) {
         // Nothing exists with this path
@@ -164,15 +146,13 @@ bool is_directory_utf8(
         return true;
     }
 
-    return false;// Path is not a directory
+    return false; // Path is not a directory
 }
-
 
 // ------------------------------------------
 // create_directories_utf8
 // ------------------------------------------
-bool create_directories_utf8(
-    const std::string &path)
+bool create_directories_utf8(const std::string &path)
 {
     int length;
 
@@ -181,22 +161,17 @@ bool create_directories_utf8(
     wchar_t *w_path = new wchar_t[length];
     MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, w_path, length);
 
-    int ret = CreateDirectoryW(
-      w_path,
-      nullptr
-    );
+    int ret = CreateDirectoryW(w_path, nullptr);
 
-    delete [] w_path;
+    delete[] w_path;
 
     return ret != 0;
 }
 
-
 // ------------------------------------------
 // pipp_get_filename_from_filepath
 // ------------------------------------------
-const char *pipp_get_filename_from_filepath(
-    const std::string &path)
+const char *pipp_get_filename_from_filepath(const std::string &path)
 {
     const char *p_name;
 

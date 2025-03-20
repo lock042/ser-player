@@ -15,10 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
+#include "persistent_data.h"
 #include <QDebug>
 #include <QSettings>
-#include "persistent_data.h"
 
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
@@ -26,19 +25,20 @@
 #include <QDesktopServices>
 #endif
 
-
 //
 // Default values, used only on first run
 //
 
-uint c_persistent_data::m_last_ver_check_time = 0;
+qint64 c_persistent_data::m_last_ver_check_time = 0;
 
 QString c_persistent_data::m_selected_language = "auto";
 
 #if QT_VERSION >= 0x050000
-QString c_persistent_data::m_ser_directory = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation)[0];
+QString c_persistent_data::m_ser_directory = QStandardPaths::standardLocations(
+    QStandardPaths::DocumentsLocation)[0];
 #else
-QString c_persistent_data::m_ser_directory = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+QString c_persistent_data::m_ser_directory = QDesktopServices::storageLocation(
+    QDesktopServices::DocumentsLocation);
 #endif
 
 QString c_persistent_data::m_new_version = "v1.0.0";
@@ -52,7 +52,6 @@ int c_persistent_data::m_play_direction = 0;
 bool c_persistent_data::m_histogram_enabled = false;
 bool c_persistent_data::m_markers_enabled = false;
 int c_persistent_data::m_selection_box_colour = 0;
-
 
 //
 // Load persistent data
@@ -88,7 +87,6 @@ void c_persistent_data::load()
         m_check_for_updates = settings.value("check_for_updates").toBool();
     }
 
-
     if (settings.value("disconnect_playback_controls") != QVariant::Invalid) {
         m_disconnect_playback_controls = settings.value("disconnect_playback_controls").toBool();
     }
@@ -113,8 +111,7 @@ void c_persistent_data::load()
         m_selection_box_colour = settings.value("selection_box_colour").toInt();
     }
 }
-	
-	
+
 //
 // Save persistent data
 //
@@ -130,7 +127,7 @@ void c_persistent_data::save()
     settings.setValue("check_for_updates", m_check_for_updates);
     settings.setValue("disconnect_playback_controls", m_disconnect_playback_controls);
     settings.setValue("playback_repeat", m_repeat);
-    settings.setValue("play_direction", m_play_direction);   
+    settings.setValue("play_direction", m_play_direction);
     settings.setValue("histogram_enabled", m_histogram_enabled);
     settings.setValue("markers_enabled", m_markers_enabled);
     settings.setValue("selection_box_colour", m_selection_box_colour);
