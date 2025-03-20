@@ -117,9 +117,9 @@ DEFINES += QT_BUILD
 # Comment string added to generated GIFs
 DEFINES += GIF_COMMENT_STRING='"\\\"Created by SER Player\\\""'
 
-CONFIG += c++11
+CONFIG += c++17
 CONFIG += warn_on
-unix:!macx:QMAKE_CXXFLAGS += -std=gnu++0x
+unix:!macx:QMAKE_CXXFLAGS += -std=gnu++17
 
 # Internationalisation
 TRANSLATIONS = translations/ser_player_da.ts \

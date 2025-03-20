@@ -18,9 +18,9 @@
 #include <QDebug>
 
 #include <QMenu>
-#include <QPainterPath>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
 #include <QSlider>
 #include <QStyleOptionSlider>
 #include <Qt>

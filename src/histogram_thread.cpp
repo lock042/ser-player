@@ -57,8 +57,8 @@ void c_histogram_thread::generate_histogram(c_image *p_image, int frame_number)
         mp_buffer.reset(new uint8_t[m_buffer_size]);
         // Copy image data to local buffer
         memcpy(mp_buffer.get(), p_image->get_p_buffer(), m_buffer_size);
-        generate_histogram_data_thread
-            = QtConcurrent::run([this]() { this->calculate_pixmap_data(); });
+        generate_histogram_data_thread = QtConcurrent::run(
+            [this]() { this->calculate_pixmap_data(); });
     }
 }
 

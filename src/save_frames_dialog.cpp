@@ -153,7 +153,10 @@ c_save_frames_dialog::c_save_frames_dialog(QWidget *parent,
     save_all_HLayout->addStretch(0);
 
     QVBoxLayout *save_range_VLayout = new QVBoxLayout;
-    save_range_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN);
+    save_range_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN,
+                                           INSIDE_GBOX_MARGIN,
+                                           INSIDE_GBOX_MARGIN,
+                                           INSIDE_GBOX_MARGIN);
     save_range_VLayout->setSpacing(INSIDE_GBOX_SPACING);
     save_range_VLayout->addLayout(save_current_HLayout);
     save_range_VLayout->addLayout(save_marked_HLayout);
@@ -258,7 +261,10 @@ c_save_frames_dialog::c_save_frames_dialog(QWidget *parent,
         + "<b></b>");
 
     QHBoxLayout *frame_decimation_HLayout = new QHBoxLayout;
-    frame_decimation_HLayout->setContentsMargins(INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN);
+    frame_decimation_HLayout->setContentsMargins(INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN);
     frame_decimation_HLayout->setSpacing(INSIDE_GBOX_SPACING);
     frame_decimation_HLayout->addWidget(frame_decimation_Label);
     frame_decimation_HLayout->addWidget(mp_frame_decimation_SpinBox);
@@ -303,7 +309,10 @@ c_save_frames_dialog::c_save_frames_dialog(QWidget *parent,
             SLOT(update_num_frames_slot()));
 
     QVBoxLayout *sequence_direction_VLayout = new QVBoxLayout;
-    sequence_direction_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN);
+    sequence_direction_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN,
+                                                   INSIDE_GBOX_MARGIN,
+                                                   INSIDE_GBOX_MARGIN,
+                                                   INSIDE_GBOX_MARGIN);
     sequence_direction_VLayout->setSpacing(INSIDE_GBOX_SPACING);
     sequence_direction_VLayout->addWidget(mp_forwards_sequence_RButton);
     sequence_direction_VLayout->addWidget(mp_reverse_sequence_RButton);
@@ -323,7 +332,10 @@ c_save_frames_dialog::c_save_frames_dialog(QWidget *parent,
     connect(mp_processing_enable_CBox, SIGNAL(toggled(bool)), this, SLOT(resize_control_handler()));
 
     QVBoxLayout *processing_enable_VLayout = new QVBoxLayout;
-    processing_enable_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN);
+    processing_enable_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN,
+                                                  INSIDE_GBOX_MARGIN,
+                                                  INSIDE_GBOX_MARGIN,
+                                                  INSIDE_GBOX_MARGIN);
     processing_enable_VLayout->setSpacing(INSIDE_GBOX_SPACING);
     processing_enable_VLayout->addWidget(mp_processing_enable_CBox);
 
@@ -431,7 +443,10 @@ c_save_frames_dialog::c_save_frames_dialog(QWidget *parent,
         tr("Append each image filename with its timestamp", "Save frames dialog") + "<b></b>");
 
     QVBoxLayout *filename_generation_VLayout = new QVBoxLayout;
-    filename_generation_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN);
+    filename_generation_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN,
+                                                    INSIDE_GBOX_MARGIN,
+                                                    INSIDE_GBOX_MARGIN,
+                                                    INSIDE_GBOX_MARGIN);
     filename_generation_VLayout->setSpacing(INSIDE_GBOX_SPACING);
     filename_generation_VLayout->addWidget(mp_use_framenumber_in_filename);
     filename_generation_VLayout->addWidget(mp_append_timestamp_CBox);
@@ -500,7 +515,10 @@ c_save_frames_dialog::c_save_frames_dialog(QWidget *parent,
     header_fields_GBox->setLayout(header_fields_GLayout);
 
     QVBoxLayout *ser_file_options_VLayout = new QVBoxLayout;
-    ser_file_options_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN);
+    ser_file_options_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN);
     ser_file_options_VLayout->setSpacing(INSIDE_GBOX_SPACING);
     ser_file_options_VLayout->addWidget(mp_include_timestamps_CBox);
     ser_file_options_VLayout->addWidget(header_fields_GBox);
@@ -549,7 +567,10 @@ c_save_frames_dialog::c_save_frames_dialog(QWidget *parent,
     avi_old_format_HLayout->addStretch();
 
     QVBoxLayout *avi_file_options_VLayout = new QVBoxLayout;
-    avi_file_options_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN);
+    avi_file_options_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN);
     avi_file_options_VLayout->setSpacing(INSIDE_GBOX_SPACING);
     avi_file_options_VLayout->addLayout(avi_framerate_HLayout);
     avi_file_options_VLayout->addLayout(avi_old_format_HLayout);
@@ -679,7 +700,10 @@ c_save_frames_dialog::c_save_frames_dialog(QWidget *parent,
     gif_advanced_options_GBox->setLayout(gif_advanced_options_HLayout);
 
     QVBoxLayout *gif_file_options_VLayout = new QVBoxLayout;
-    gif_file_options_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN, INSIDE_GBOX_MARGIN);
+    gif_file_options_VLayout->setContentsMargins(INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN,
+                                                 INSIDE_GBOX_MARGIN);
     gif_file_options_VLayout->setSpacing(INSIDE_GBOX_SPACING);
     gif_file_options_VLayout->addLayout(gif_file_options_HLayout);
     gif_file_options_VLayout->addWidget(gif_advanced_options_GBox);

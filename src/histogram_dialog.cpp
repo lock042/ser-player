@@ -17,12 +17,12 @@
 
 #include <QDebug>
 
-#include <QScreen>
-#include <QGuiApplication>
 #include <QDoubleSpinBox>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QScreen>
 #include <QVBoxLayout>
 #include <Qt>
 

@@ -17,9 +17,9 @@
 
 #include <QDebug>
 
-#include <QScreen>
 #include <QGuiApplication>
 #include <QLabel>
+#include <QScreen>
 #include <QVBoxLayout>
 #include <Qt>
 
