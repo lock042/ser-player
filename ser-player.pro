@@ -248,6 +248,17 @@ contains(DEFINES, USE_SYSTEM_LIBPNG) {
         libpng/pngwtran.c \
         libpng/pngwutil.c
 
+macx {
+    # Check if we're running on ARM architecture (Apple Silicon)
+    system("uname -m | grep -q 'arm64'") {
+        message("Detected macOS ARM64 architecture")
+        SOURCES += libpng/arm/arm_init.c \
+            libpng/arm/filter_neon.S \
+            libpng/arm/filter_neon_intrinsics.c \
+            libpng/arm/palette_neon_intrinsics.c
+    }
+}
+
     # zlib source files
     SOURCES += zlib/adler32.c \
         zlib/compress.c \
