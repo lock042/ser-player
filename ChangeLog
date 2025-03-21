@@ -1,3 +1,14 @@
+v1.8.0: 20/03/2025
+Enhancements:
+ * Updated the application to use Qt6, ensuring compatibility with modern operating systems.
+ * Migrated the project to a new maintainer, Cyril Richard, who continues development.
+
+Technical Updates:
+ * Modernized C++ code to use C++17 standard.
+ * Updated AppImage generation scripts for better Linux compatibility.
+ * Resolved various Qt deprecated API issues.
+ 
+ 
 v1.7.2: 13/02/2018
 Bug Fixes:
  * Corrections to Polish translations.

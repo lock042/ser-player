@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef SAVE_FRAMES_PROGRESS_DIALOG_H
 #define SAVE_FRAMES_PROGRESS_DIALOG_H
 
@@ -25,15 +24,12 @@ class QLabel;
 class QProgressBar;
 class QPushButton;
 
-
 class c_save_frames_progress_dialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    c_save_frames_progress_dialog(QWidget *parent,
-                                  int min_value,
-                                  int max_value);
+    c_save_frames_progress_dialog(QWidget *parent, int min_value, int max_value);
     void set_value(int value);
     void set_button_label(QString label);
     bool was_cancelled();
@@ -41,14 +37,12 @@ public:
 
 signals:
 
-    
 private slots:
     void cancel_button_clicked_slot();
 
-    
 private:
     // Private methods
-    
+
     // Widgets
     QLabel *mp_text_label;
     QProgressBar *mp_progress_bar;
@@ -56,7 +50,6 @@ private:
 
     int m_cancelled;
     int m_total_frames;
-
 };
 
 #endif // SAVE_FRAMES_PROGRESS_DIALOG_H

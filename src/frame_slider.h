@@ -15,15 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef FRAME_SLIDER_H
 #define FRAME_SLIDER_H
 
 #include <QSlider>
 
-
 class c_markers_dialog;
-
 
 class c_frame_slider : public QSlider
 {
@@ -56,7 +53,7 @@ public slots:
     void reset_all_markers_slot();
 
 private slots:
-    void ShowContextMenu(const QPoint& pos);
+    void ShowContextMenu(const QPoint &pos);
 
 protected:
     void paintEvent(QPaintEvent *event);

@@ -18,20 +18,21 @@
 #include <QDebug>
 
 #include <QApplication>
-#include <Qt>
 #include <QLabel>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QString>
 #include <QVBoxLayout>
+#include <Qt>
 
 #include "save_frames_progress_dialog.h"
 
-
-c_save_frames_progress_dialog::c_save_frames_progress_dialog(QWidget *parent, int min_value, int max_value)
-    : QDialog(parent),
-      m_cancelled(false),
-      m_total_frames(max_value - min_value + 1)
+c_save_frames_progress_dialog::c_save_frames_progress_dialog(QWidget *parent,
+                                                             int min_value,
+                                                             int max_value)
+    : QDialog(parent)
+    , m_cancelled(false)
+    , m_total_frames(max_value - min_value + 1)
 {
     setWindowTitle(tr("Save Frames As Images"));
     QDialog::setWindowFlags(QDialog::windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -39,13 +40,13 @@ c_save_frames_progress_dialog::c_save_frames_progress_dialog(QWidget *parent, in
     mp_text_label = new QLabel(tr("Saving %1 frames").arg(max_value - min_value + 1));
     mp_text_label->setMinimumWidth(mp_text_label->sizeHint().width() * 3);
     mp_progress_bar = new QProgressBar;
-    mp_progress_bar->setRange(min_value-1, max_value);
+    mp_progress_bar->setRange(min_value - 1, max_value);
 
     mp_abort_close_button = new QPushButton(tr("Abort", "Save frames progress"));
     connect(mp_abort_close_button, SIGNAL(clicked()), this, SLOT(cancel_button_clicked_slot()));
-    
+
     QVBoxLayout *dialog_vlayout = new QVBoxLayout;
-    dialog_vlayout->setMargin(15);
+    dialog_vlayout->setContentsMargins(15, 15, 15, 15);
     dialog_vlayout->setSpacing(0);
     dialog_vlayout->addWidget(mp_text_label, 0, Qt::AlignLeft);
     dialog_vlayout->addSpacing(15);
@@ -58,19 +59,16 @@ c_save_frames_progress_dialog::c_save_frames_progress_dialog(QWidget *parent, in
     layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
-
 void c_save_frames_progress_dialog::set_button_label(QString label)
 {
     mp_abort_close_button->setText(label);
 }
-
 
 void c_save_frames_progress_dialog::set_value(int value)
 {
     mp_progress_bar->setValue(value);
     qApp->processEvents();
 }
-
 
 void c_save_frames_progress_dialog::set_complete()
 {
@@ -79,13 +77,11 @@ void c_save_frames_progress_dialog::set_complete()
     mp_abort_close_button->setText(tr("Close", "Save frames progress"));
 }
 
-
 bool c_save_frames_progress_dialog::was_cancelled()
 {
     qApp->processEvents();
     return m_cancelled;
 }
-
 
 void c_save_frames_progress_dialog::cancel_button_clicked_slot()
 {

@@ -15,14 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef NEW_VERSION_CHECKER_H
 #define NEW_VERSION_CHECKER_H
 
-#include <QObject>
-#include <QNetworkAccessManager>
 #include <QList>
-
+#include <QNetworkAccessManager>
+#include <QObject>
 
 class c_new_version_checker : public QObject
 {
@@ -36,14 +34,13 @@ signals:
     void new_version_available_signal(QString new_version);
 
 public slots:
-    void finished(QNetworkReply * reply);
+    void finished(QNetworkReply *reply);
 
 private:
     QString m_version;
     QNetworkAccessManager *net_access_manager;
-    QString rstrip(const QString& str);
+    QString rstrip(const QString &str);
     static QList<int> get_version_from_string(const QString &ver_string);
-
 };
 
 #endif // NEW_VERSION_CHECKER_H

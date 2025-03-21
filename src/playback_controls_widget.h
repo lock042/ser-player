@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef PLAYBACK_CONTROLS_WIDGET_H
 #define PLAYBACK_CONTROLS_WIDGET_H
 
@@ -25,7 +24,6 @@
 class QLabel;
 class QPushButton;
 class c_frame_slider;
-
 
 class c_playback_controls_widget : public QWidget
 {
@@ -74,7 +72,7 @@ public slots:
     void set_end_marker_slot(int frame);
     void reset_all_markers_slot();
     void update_zoom_label_slot(int zoom);
-    
+
 private slots:
     void play_direction_button_pressed_slot();
     void repeat_button_toggled_slot(bool checked);
@@ -96,7 +94,7 @@ private:
     // Widgets
     //
     c_frame_slider *mp_frame_Slider;
-    
+
     QPixmap m_play_Pixmap;
     QPixmap m_pause_Pixmap;
     QPixmap m_forward_play_Pixmap;
@@ -108,7 +106,7 @@ private:
     QPushButton *mp_stop_PushButton;
     QPushButton *mp_repeat_PushButton;
     QPushButton *mp_play_direction_PushButton;
-    
+
     QString m_zoom_label_String;
     QLabel *mp_zoom_Label;
     QString m_frame_size_label_String;
@@ -133,10 +131,8 @@ private:
     int m_play_direction;
     bool m_forward_button_held;
     bool m_back_button_held;
-    enum e_state {STATE_NO_FILE, STATE_STOPPED, STATE_PLAYING, STATE_PAUSED, STATE_FINISHED};
+    enum e_state { STATE_NO_FILE, STATE_STOPPED, STATE_PLAYING, STATE_PAUSED, STATE_FINISHED };
     enum e_state m_current_state;
-    
-
 };
 
 #endif // PLAYBACK_CONTROLS_WIDGET_H

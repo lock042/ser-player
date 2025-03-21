@@ -15,24 +15,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef HISTOGRAM_THREAD_H
 #define HISTOGRAM_THREAD_H
 
 #include <QDialog>
-#include <QThread>
 #include <QFuture>
+#include <QThread>
 #include <cstdint>
 #include <memory>
 
-
 class c_image;
-
 
 class c_histogram_thread : public QObject
 {
     Q_OBJECT
-
 
 public:
     // Constructor
@@ -49,22 +45,17 @@ public:
 
     // Methed to return frame number for the last histogram generated or the
     // histogram currently being generated
-    int get_frame_number()
-    {
-        return m_frame_number;
-    }
+    int get_frame_number() { return m_frame_number; }
 
     // Method to return if the thread is ready to generate a new histogram
     bool is_running()
     {
         return m_is_running;
-//        return generate_histogram_data_thread.isRunning();
+        //        return generate_histogram_data_thread.isRunning();
     }
-    
-    
+
 private:
     void calculate_pixmap_data();
-
 
 signals:
     // Signal to pass the histogram pixmap back once it is generated
@@ -72,10 +63,8 @@ signals:
 
 public slots:
 
-    
 private slots:
 
-    
 private:
     bool m_is_running;
     int m_frame_number;

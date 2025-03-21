@@ -15,17 +15,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef SELECTION_BOX_DIALOG_H
 #define SELECTION_BOX_DIALOG_H
 
-#include <QPoint>
 #include <QDialog>
+#include <QPoint>
 
 class QGroupBox;
 class QSpinBox;
 class QComboBox;
-
 
 class c_selection_box_dialog : public QDialog
 {
@@ -35,12 +33,10 @@ public:
     c_selection_box_dialog(QWidget *parent = 0);
     QColor get_selection_colour();
 
-
 signals:
     void selection_box_changed(QRect selection_rect);
     void selection_box_complete(bool accepted, QRect selection_rect);
     void update_request_signal();
-
 
 public slots:
     void start_get_selection_box_slot(int width, int height);
@@ -50,7 +46,6 @@ public slots:
     void reset_selection_box_slot();
     void update_selection_box(const QPoint &top_left_corner, const QPoint &bottom_right_corner);
 
-
 private slots:
     void spinbox_changed_slot();
     void selection_box_colour_changed();
@@ -58,11 +53,11 @@ private slots:
 protected:
     void reject();
     void accept();
-    
+
 private:
     // Private methods
-//    void helper_method();
-    
+    //    void helper_method();
+
     // Widgets
     QGroupBox *mp_area_select_GroupBox;
     QSpinBox *mp_x_pos_SpinBox;
@@ -75,7 +70,6 @@ private:
     int m_width;
     int m_height;
     bool m_spinbox_values_valid;
-
 };
 
 #endif // SELECTION_BOX_DIALOG_H

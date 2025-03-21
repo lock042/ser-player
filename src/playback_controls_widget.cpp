@@ -17,27 +17,26 @@
 
 #include <QDebug>
 
-#include <Qt>
 #include <QApplication>
+#include <QDebug>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QLabel>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QTimer>
-#include <QMouseEvent>
-#include <QDebug>
+#include <QVBoxLayout>
+#include <Qt>
 
-#include "playback_controls_widget.h"
-#include "pipp_timestamp.h"
-#include "persistent_data.h"
 #include "frame_slider.h"
-
+#include "persistent_data.h"
+#include "pipp_timestamp.h"
+#include "playback_controls_widget.h"
 
 c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
-    : QWidget(parent),
-      m_framecount_label_min_width(0),
-      m_datestamp_label_min_width(0),
-      m_timestamp_label_min_width(0)
+    : QWidget(parent)
+    , m_framecount_label_min_width(0)
+    , m_datestamp_label_min_width(0)
+    , m_timestamp_label_min_width(0)
 {
     //setWindowTitle(tr("Playback"));
     //QDialog::setWindowFlags(QDialog::windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -46,14 +45,14 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
     m_back_button_held = false;
     m_forward_button_held = false;
     m_current_state = STATE_NO_FILE;
-    
+
     mp_frame_Slider = new c_frame_slider(this);
     mp_frame_Slider->set_maximum_frame(99);
     mp_frame_Slider->set_direction(m_play_direction);
     mp_frame_Slider->set_repeat(c_persistent_data::m_repeat);
     //connect(mp_markers_dialog_Act, SIGNAL(triggered(bool)), mp_frame_Slider, SLOT(show_markers_dialog(bool)));
     //connect(mp_frame_Slider, SIGNAL(markers_dialog_closed()), this, SLOT(markers_dialog_closed_slot()));
-    
+
     m_play_Pixmap = QPixmap(":/res/resources/play_button.png");
     m_pause_Pixmap = QPixmap(":/res/resources/pause_button.png");
 
@@ -61,15 +60,18 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
     QPixmap forward_Pixmap = QPixmap(":/res/resources/forward_button.png");
     mp_forward_PushButton->setIcon(forward_Pixmap);
     mp_forward_PushButton->setIconSize(forward_Pixmap.size());
-    mp_forward_PushButton->setFixedSize(forward_Pixmap.size() + QSize(10, 10));  // Nice and small
-    mp_forward_PushButton->setToolTip(tr("Click to advance 1 frame\nShift-Click to advance multiple frames", "Button Tool tip"));  // Nice and small
+    mp_forward_PushButton->setFixedSize(forward_Pixmap.size() + QSize(10, 10)); // Nice and small
+    mp_forward_PushButton->setToolTip(
+        tr("Click to advance 1 frame\nShift-Click to advance multiple frames",
+           "Button Tool tip")); // Nice and small
 
     mp_back_PushButton = new QPushButton;
     QPixmap back_Pixmap = QPixmap(":/res/resources/back_button.png");
     mp_back_PushButton->setIcon(back_Pixmap);
     mp_back_PushButton->setIconSize(back_Pixmap.size());
     mp_back_PushButton->setFixedSize(back_Pixmap.size() + QSize(10, 10));
-    mp_back_PushButton->setToolTip(tr("Click to go back 1 frame\nShift-Click to go back multiple frames", "Button Tool tip"));
+    mp_back_PushButton->setToolTip(
+        tr("Click to go back 1 frame\nShift-Click to go back multiple frames", "Button Tool tip"));
 
     mp_play_PushButton = new QPushButton;
     mp_play_PushButton->setIcon(m_play_Pixmap);
@@ -111,7 +113,10 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
     mp_play_direction_PushButton->setIconSize(m_forward_play_Pixmap.size());
     mp_play_direction_PushButton->setFixedSize(m_forward_play_Pixmap.size() + QSize(10, 10));
     mp_play_direction_PushButton->setToolTip(tr("Play Direction", "Button Tool tip"));
-    connect(mp_play_direction_PushButton, SIGNAL(clicked()), this, SLOT(play_direction_button_pressed_slot()));
+    connect(mp_play_direction_PushButton,
+            SIGNAL(clicked()),
+            this,
+            SLOT(play_direction_button_pressed_slot()));
 
     m_framecount_label_String = tr("%1/%2", "Frame number/Frame count label");
     mp_framecount_Label = new QLabel;
@@ -129,7 +134,7 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
     mp_colour_id_Label->setToolTip(tr("Colour ID", "Tool tip"));
 
     m_zoom_label_String = tr("%1%", "Zoom level label");
-    mp_zoom_Label =  new QLabel;
+    mp_zoom_Label = new QLabel;
     mp_zoom_Label->setText(m_zoom_label_String.arg(100));
     mp_zoom_Label->setToolTip(tr("Display Zoom Level", "Tool tip"));
 
@@ -159,7 +164,7 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
 
     QHBoxLayout *slider_h_layout = new QHBoxLayout;
     slider_h_layout->setSpacing(0);
-    slider_h_layout->setMargin(0);
+    slider_h_layout->setContentsMargins(0, 0, 0, 0);
     slider_h_layout->addWidget(mp_back_PushButton);
 #ifdef __APPLE__
     slider_h_layout->addSpacing(15);
@@ -176,7 +181,7 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
 
     QHBoxLayout *controls_h_layout1 = new QHBoxLayout;
     controls_h_layout1->setSpacing(8);
-    controls_h_layout1->setMargin(0);
+    controls_h_layout1->setContentsMargins(0, 0, 0, 0);
     controls_h_layout1->addStretch(1);
     controls_h_layout1->addWidget(mp_zoom_Label, 0, Qt::AlignTop | Qt::AlignRight);
     controls_h_layout1->addWidget(mp_frame_size_Label, 0, Qt::AlignTop | Qt::AlignRight);
@@ -185,9 +190,9 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
     controls_h_layout1->addWidget(mp_framecount_Label, 0, Qt::AlignTop | Qt::AlignRight);
 
     QHBoxLayout *controls_h_layout2 = new QHBoxLayout;
-    controls_h_layout2->setMargin(0);
+    controls_h_layout2->setContentsMargins(0, 0, 0, 0);
     controls_h_layout2->setSpacing(0);
-    controls_h_layout2->setMargin(0);
+    controls_h_layout2->setContentsMargins(0, 0, 0, 0);
     controls_h_layout2->addStretch();
     controls_h_layout2->addWidget(mp_fps_Label, 0, Qt::AlignRight);
     controls_h_layout2->addSpacing(8);
@@ -197,7 +202,7 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
 
     QVBoxLayout *controls_v_layout1 = new QVBoxLayout;
     controls_v_layout1->setSpacing(0);
-    controls_v_layout1->setMargin(0);
+    controls_v_layout1->setContentsMargins(0, 0, 0, 0);
     controls_v_layout1->addLayout(controls_h_layout1);
     controls_v_layout1->addLayout(controls_h_layout2);
 
@@ -207,7 +212,7 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
 #else
     controls_h_layout->setSpacing(4);
 #endif
-    controls_h_layout->setMargin(0);
+    controls_h_layout->setContentsMargins(0, 0, 0, 0);
     controls_h_layout->addWidget(mp_play_PushButton, 0, Qt::AlignTop);
     controls_h_layout->addWidget(mp_stop_PushButton, 0, Qt::AlignTop);
     controls_h_layout->addWidget(mp_repeat_PushButton, 0, Qt::AlignTop);
@@ -217,20 +222,26 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
 
     QVBoxLayout *controls_main_layout = new QVBoxLayout;
     controls_main_layout->setSpacing(5);
-    controls_main_layout->setMargin(5);
+    controls_main_layout->setContentsMargins(5, 5, 5, 5);
     controls_main_layout->addLayout(slider_h_layout);
     controls_main_layout->addLayout(controls_h_layout);
-    
+
     setLayout(controls_main_layout);
 
     // Connect up frame slider signals
-    connect(mp_frame_Slider, SIGNAL(start_marker_changed(int)), this, SIGNAL(start_marker_changed(int)));
+    connect(mp_frame_Slider,
+            SIGNAL(start_marker_changed(int)),
+            this,
+            SIGNAL(start_marker_changed(int)));
     connect(mp_frame_Slider, SIGNAL(end_marker_changed(int)), this, SIGNAL(end_marker_changed(int)));
     connect(mp_frame_Slider, SIGNAL(markers_dialog_closed()), this, SIGNAL(markers_dialog_closed()));
     connect(mp_frame_Slider, SIGNAL(valueChanged(int)), this, SLOT(slider_value_changed_slot(int)));
 
     // Connect up button signals
-    connect (mp_repeat_PushButton, SIGNAL(toggled(bool)), this, SLOT(repeat_button_toggled_slot(bool)));
+    connect(mp_repeat_PushButton,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(repeat_button_toggled_slot(bool)));
     connect(mp_forward_PushButton, SIGNAL(pressed()), this, SLOT(forward_button_pressed_slot()));
     connect(mp_forward_PushButton, SIGNAL(released()), this, SLOT(forward_button_released_slot()));
     connect(mp_back_PushButton, SIGNAL(pressed()), this, SLOT(back_button_pressed_slot()));
@@ -240,7 +251,6 @@ c_playback_controls_widget::c_playback_controls_widget(QWidget *parent)
 
     setToolTip(tr("Double-Click to Attach/Detach Playback Controls"));
 }
-
 
 void c_playback_controls_widget::reset_labels()
 {
@@ -259,31 +269,25 @@ void c_playback_controls_widget::slider_value_changed_slot(int value)
     emit slider_value_changed(value);
 }
 
-
-
 int c_playback_controls_widget::slider_value()
 {
     return mp_frame_Slider->value();
 }
-
 
 bool c_playback_controls_widget::get_markers_enable()
 {
     return mp_frame_Slider->get_markers_enable();
 }
 
-
 void c_playback_controls_widget::set_repeat(bool repeat)
 {
     return mp_frame_Slider->set_repeat(repeat);
 }
 
-
 void c_playback_controls_widget::goto_first_frame()
 {
     mp_frame_Slider->goto_first_frame();
 }
-
 
 bool c_playback_controls_widget::goto_next_frame()
 {
@@ -296,72 +300,60 @@ bool c_playback_controls_widget::goto_next_frame()
     return ret;
 }
 
-
 int c_playback_controls_widget::get_start_frame()
 {
     return mp_frame_Slider->get_start_frame();
 }
-
 
 int c_playback_controls_widget::get_end_frame()
 {
     return mp_frame_Slider->get_end_frame();
 }
 
-
 void c_playback_controls_widget::show_markers_dialog(bool show)
 {
     return mp_frame_Slider->show_markers_dialog(show);
 }
-
 
 void c_playback_controls_widget::set_markers_show(bool show)
 {
     return mp_frame_Slider->set_markers_show(show);
 }
 
-
 void c_playback_controls_widget::set_markers_enable(bool active)
 {
     return mp_frame_Slider->set_markers_enable(active);
 }
-
 
 void c_playback_controls_widget::set_maximum_frame(int max_frame)
 {
     return mp_frame_Slider->set_maximum_frame(max_frame);
 }
 
-
 void c_playback_controls_widget::set_start_marker_to_current()
 {
     return mp_frame_Slider->set_start_marker_to_current();
 }
-
 
 void c_playback_controls_widget::set_start_marker_slot(int frame)
 {
     return mp_frame_Slider->set_start_marker_slot(frame);
 }
 
-
 void c_playback_controls_widget::set_end_marker_to_current()
 {
     return mp_frame_Slider->set_end_marker_to_current();
 }
-
 
 void c_playback_controls_widget::set_end_marker_slot(int frame)
 {
     return mp_frame_Slider->set_end_marker_slot(frame);
 }
 
-
 void c_playback_controls_widget::reset_all_markers_slot()
 {
     return mp_frame_Slider->reset_all_markers_slot();
 }
-
 
 void c_playback_controls_widget::play_direction_button_pressed_slot()
 {
@@ -379,18 +371,15 @@ void c_playback_controls_widget::play_direction_button_pressed_slot()
         mp_play_direction_PushButton->setIcon(m_forward_play_Pixmap);
     }
 
-
     c_persistent_data::m_play_direction = m_play_direction;
     mp_frame_Slider->set_direction(m_play_direction);
 }
-
 
 void c_playback_controls_widget::repeat_button_toggled_slot(bool checked)
 {
     c_persistent_data::m_repeat = checked;
     mp_frame_Slider->set_repeat(checked);
 }
-
 
 void c_playback_controls_widget::forward_button_pressed_slot()
 {
@@ -416,18 +405,17 @@ void c_playback_controls_widget::forward_button_pressed_slot()
     }
 }
 
-
 void c_playback_controls_widget::forward_button_released_slot()
 {
     m_forward_button_held = false;
 }
 
-
 void c_playback_controls_widget::forward_button_held_slot()
 {
-    if (m_forward_button_held &&
-        mp_forward_PushButton->rect().contains(mp_forward_PushButton->mapFromGlobal(QCursor::pos())) &&
-        QApplication::mouseButtons() & Qt::LeftButton) {
+    if (m_forward_button_held
+        && mp_forward_PushButton->rect().contains(
+            mp_forward_PushButton->mapFromGlobal(QCursor::pos()))
+        && QApplication::mouseButtons() & Qt::LeftButton) {
         // Forward button is still being held
         if (m_current_state != STATE_NO_FILE && m_current_state != STATE_PLAYING) {
             bool shift_key = QApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier);
@@ -450,7 +438,6 @@ void c_playback_controls_widget::forward_button_held_slot()
         QTimer::singleShot(100, this, SLOT(forward_button_held_slot()));
     }
 }
-
 
 void c_playback_controls_widget::back_button_pressed_slot()
 {
@@ -476,19 +463,16 @@ void c_playback_controls_widget::back_button_pressed_slot()
     }
 }
 
-
 void c_playback_controls_widget::back_button_released_slot()
 {
     m_back_button_held = false;
 }
 
-
-
 void c_playback_controls_widget::back_button_held_slot()
 {
-    if (m_back_button_held &&
-        mp_back_PushButton->rect().contains(mp_back_PushButton->mapFromGlobal(QCursor::pos())) &&
-        QApplication::mouseButtons() & Qt::LeftButton) {
+    if (m_back_button_held
+        && mp_back_PushButton->rect().contains(mp_back_PushButton->mapFromGlobal(QCursor::pos()))
+        && QApplication::mouseButtons() & Qt::LeftButton) {
         // Forward button is still being held
         if (m_current_state != STATE_NO_FILE && m_current_state != STATE_PLAYING) {
             bool shift_key = QApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier);
@@ -512,11 +496,9 @@ void c_playback_controls_widget::back_button_held_slot()
     }
 }
 
-
 void c_playback_controls_widget::play_button_pressed_slot()
 {
-    if (m_current_state == STATE_NO_FILE)
-    {
+    if (m_current_state == STATE_NO_FILE) {
         emit open_ser_file_signal();
     } else {
         if (m_current_state == STATE_PLAYING) {
@@ -540,12 +522,10 @@ void c_playback_controls_widget::play_button_pressed_slot()
     }
 }
 
-
 void c_playback_controls_widget::stop_button_pressed_slot()
 {
     stop_playback();
 }
-
 
 void c_playback_controls_widget::start_playback()
 {
@@ -564,7 +544,6 @@ void c_playback_controls_widget::start_playback()
     }
 }
 
-
 void c_playback_controls_widget::pause_payback()
 {
     if (m_current_state == STATE_PLAYING) {
@@ -575,31 +554,26 @@ void c_playback_controls_widget::pause_payback()
     }
 }
 
-
 void c_playback_controls_widget::stop_playback()
 {
     if (m_current_state != STATE_NO_FILE) {
         mp_play_PushButton->setIcon(m_play_Pixmap);
         emit stop_playing_signal();
-        if (m_current_state != STATE_FINISHED)
-        {
+        if (m_current_state != STATE_FINISHED) {
             m_current_state = STATE_STOPPED;
             mp_frame_Slider->goto_first_frame();
         }
     }
 }
 
-
 bool c_playback_controls_widget::is_playing()
 {
     return (m_current_state == STATE_PLAYING);
 }
 
-
 void c_playback_controls_widget::update_framecount_label(int count, int maxcount)
 {
-    if (m_framecount_label_min_width < mp_framecount_Label->width())
-    {
+    if (m_framecount_label_min_width < mp_framecount_Label->width()) {
         m_framecount_label_min_width = mp_framecount_Label->width();
         mp_framecount_Label->setMinimumSize(m_framecount_label_min_width, 0);
     }
@@ -612,68 +586,58 @@ void c_playback_controls_widget::update_colour_id_label(QString colour_id)
     mp_colour_id_Label->setText(colour_id);
 }
 
-
 void c_playback_controls_widget::update_pixel_depth_label(int depth)
 {
     mp_pixel_depth_Label->setText(m_pixel_depth_label_String.arg(depth));
 }
-
 
 void c_playback_controls_widget::update_frame_size_label(int width, int height)
 {
     mp_frame_size_Label->setText(m_frame_size_label_String.arg(width).arg(height));
 }
 
-
 void c_playback_controls_widget::update_zoom_label_slot(int zoom)
 {
     mp_zoom_Label->setText(m_zoom_label_String.arg(zoom));
 }
-
 
 void c_playback_controls_widget::update_fps_label(int fps)
 {
     mp_fps_Label->setText(m_fps_label_String.arg(fps));
 }
 
-
 void c_playback_controls_widget::update_timestamp_label(uint64_t timestamp)
 {
     if (timestamp > 0) {
-        if (m_datestamp_label_min_width < mp_datestamp_Label->width())
-        {
+        if (m_datestamp_label_min_width < mp_datestamp_Label->width()) {
             m_datestamp_label_min_width = mp_datestamp_Label->width();
             mp_datestamp_Label->setMinimumSize(m_datestamp_label_min_width, 0);
         }
 
-        if (m_timestamp_label_min_width < mp_timestamp_Label->width())
-        {
+        if (m_timestamp_label_min_width < mp_timestamp_Label->width()) {
             m_timestamp_label_min_width = mp_timestamp_Label->width();
             mp_timestamp_Label->setMinimumSize(m_timestamp_label_min_width, 0);
         }
 
         int32_t ts_year, ts_month, ts_day, ts_hour, ts_minute, ts_second, ts_microsec;
-        c_pipp_timestamp::timestamp_to_date(
-            timestamp,
-            &ts_year,
-            &ts_month,
-            &ts_day,
-            &ts_hour,
-            &ts_minute,
-            &ts_second,
-            &ts_microsec);
+        c_pipp_timestamp::timestamp_to_date(timestamp,
+                                            &ts_year,
+                                            &ts_month,
+                                            &ts_day,
+                                            &ts_hour,
+                                            &ts_minute,
+                                            &ts_second,
+                                            &ts_microsec);
 
         int32_t ts_millisec = ts_microsec / 1000;
-        mp_datestamp_Label->setText(m_datestamp_label_String
-                                    .arg(ts_year, 4, 10, QLatin1Char( '0' ))
-                                    .arg(ts_month, 2, 10, QLatin1Char( '0' ))
-                                    .arg(ts_day, 2, 10, QLatin1Char( '0' )));
+        mp_datestamp_Label->setText(m_datestamp_label_String.arg(ts_year, 4, 10, QLatin1Char('0'))
+                                        .arg(ts_month, 2, 10, QLatin1Char('0'))
+                                        .arg(ts_day, 2, 10, QLatin1Char('0')));
 
-        mp_timestamp_Label->setText(m_timestamp_label_String
-                                 .arg(ts_hour, 2, 10, QLatin1Char( '0' ))
-                                 .arg(ts_minute, 2, 10, QLatin1Char( '0' ))
-                                 .arg(ts_second, 2, 10, QLatin1Char( '0' ))
-                                 .arg(ts_millisec, 3, 10, QLatin1Char( '0' )));
+        mp_timestamp_Label->setText(m_timestamp_label_String.arg(ts_hour, 2, 10, QLatin1Char('0'))
+                                        .arg(ts_minute, 2, 10, QLatin1Char('0'))
+                                        .arg(ts_second, 2, 10, QLatin1Char('0'))
+                                        .arg(ts_millisec, 3, 10, QLatin1Char('0')));
     } else {
         m_datestamp_label_min_width = 0;
         mp_datestamp_Label->setMinimumSize(0, 0);
@@ -684,10 +648,8 @@ void c_playback_controls_widget::update_timestamp_label(uint64_t timestamp)
     }
 }
 
-
 void c_playback_controls_widget::mouseDoubleClickEvent(QMouseEvent *p_event)
 {
-    (void)p_event;
+    (void) p_event;
     emit double_clicked_signal();
 }
-

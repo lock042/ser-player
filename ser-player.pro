@@ -32,9 +32,9 @@
 # ---------------------------------------------------------------------
 
 
-#BUILD_FOR_REPOSITORY=1
+BUILD_FOR_REPOSITORY=1
 defined(BUILD_FOR_REPOSITORY, var) {
-    APP_VERSION="v1.7.3"
+    APP_VERSION="v1.8.0"
     export(APP_VERSION)
 }
 
@@ -117,9 +117,9 @@ DEFINES += QT_BUILD
 # Comment string added to generated GIFs
 DEFINES += GIF_COMMENT_STRING='"\\\"Created by SER Player\\\""'
 
-CONFIG += c++11
+CONFIG += c++17
 CONFIG += warn_on
-unix:!macx:QMAKE_CXXFLAGS += -std=gnu++0x
+unix:!macx:QMAKE_CXXFLAGS += -std=gnu++17
 
 # Internationalisation
 TRANSLATIONS = translations/ser_player_da.ts \
@@ -132,7 +132,7 @@ TRANSLATIONS = translations/ser_player_da.ts \
                translations/ser_player_ja.ts
 
 # Make Mac version as backwards compatible with old OS versions as possible
-macx:QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+macx:QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
 # Remove standard function warnings on Windows
 win32:DEFINES += _CRT_SECURE_NO_WARNINGS
@@ -247,6 +247,17 @@ contains(DEFINES, USE_SYSTEM_LIBPNG) {
         libpng/pngwrite.c \
         libpng/pngwtran.c \
         libpng/pngwutil.c
+
+macx {
+    # Check if we're running on ARM architecture (Apple Silicon)
+    system("uname -m | grep -q 'arm64'") {
+        message("Detected macOS ARM64 architecture")
+        SOURCES += libpng/arm/arm_init.c \
+            libpng/arm/filter_neon.S \
+            libpng/arm/filter_neon_intrinsics.c \
+            libpng/arm/palette_neon_intrinsics.c
+    }
+}
 
     # zlib source files
     SOURCES += zlib/adler32.c \

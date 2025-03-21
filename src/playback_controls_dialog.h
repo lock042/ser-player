@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef PLAYBACK_CONTROLS_DIALOG_H
 #define PLAYBACK_CONTROLS_DIALOG_H
 
@@ -24,7 +23,6 @@
 class QLabel;
 class QVBoxLayout;
 
-
 class c_playback_controls_dialog : public QDialog
 {
     Q_OBJECT
@@ -32,23 +30,18 @@ class c_playback_controls_dialog : public QDialog
 public:
     c_playback_controls_dialog(QWidget *parent = 0);
     void add_controls_widget(QWidget *p_widget);
-    void remove_controls_widget(QWidget  *p_widget);
+    void remove_controls_widget(QWidget *p_widget);
     void move_to_default_position();
 
-    
 signals:
-
 
 public slots:
 
-    
 private slots:
 
-    
-private:    
+private:
     QLabel *mp_dummy_label;
     QVBoxLayout *mp_dialog_vlayout;
-
 };
 
 #endif // PLAYBACK_CONTROLS_DIALOG_H

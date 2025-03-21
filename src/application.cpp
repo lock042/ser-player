@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #include <QFileOpenEvent>
 #include <QLibraryInfo>
 #include <QLocale>
@@ -27,15 +26,14 @@
 
 #include <QDebug>
 
-
 c_application::c_application(int &argc, char **argv)
-    : QApplication(argc, argv),
-      mp_win(nullptr)
+    : QApplication(argc, argv)
+    , mp_win(nullptr)
 {
     setOrganizationName("PIPP");
     setApplicationName(tr("SER Player"));
     setWindowIcon(QIcon(":/res/resources/main_icon.png"));
-    c_persistent_data::load();  // Load persistent data
+    c_persistent_data::load(); // Load persistent data
 
     // If user has specified a specific locale then use that one
     QString locale = c_persistent_data::m_selected_language;
@@ -48,13 +46,12 @@ c_application::c_application(int &argc, char **argv)
     //
     // Load Qt system language translations
     //
-//    bool ret = m_qt_translator.load("qt_"+locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    //    bool ret = m_qt_translator.load("qt_"+locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     mp_qt_translator = new QTranslator;
-    bool ret = mp_qt_translator->load("qt_"+locale, ":/res/translations/");
+    bool ret = mp_qt_translator->load("qt_" + locale, ":/res/translations/");
     if (ret) {
         installTranslator(mp_qt_translator);
     }
-
 
     //
     // Load SER Player specific language translations
@@ -80,15 +77,13 @@ c_application::c_application(int &argc, char **argv)
     mp_win->show();
 }
 
-
 c_application::~c_application()
 {
     delete mp_win;
     delete mp_qt_translator;
     delete mp_ser_player_translator;
-    c_persistent_data::save();  // Save persistent data before exiting
+    c_persistent_data::save(); // Save persistent data before exiting
 }
-
 
 //
 // Event handler to support starting the SER player by double-clicking on

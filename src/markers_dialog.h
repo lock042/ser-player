@@ -15,17 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef MARKERS_DIALOG_H
 #define MARKERS_DIALOG_H
 
 #include <QDialog>
 
-
 class QGroupBox;
 class QSpinBox;
 class QLabel;
-
 
 class c_markers_dialog : public QDialog
 {
@@ -35,8 +32,7 @@ public:
     c_markers_dialog(QWidget *parent = 0);
     void set_maximum_frame(int value);
     bool get_markers_enabled();
-//    ~c_markers_dialog();
-
+    //    ~c_markers_dialog();
 
 signals:
     void start_marker_changed(int value);
@@ -45,21 +41,18 @@ signals:
     void set_end_marker_to_current();
     void markers_enabled_changed(bool enabled);
 
-
 public slots:
     void reset_markers_slot();
     void set_start_marker_slot(int value);
     void set_end_marker_slot(int value);
 
-
 private slots:
     void marker_changed_slot();
 
-    
 private:
     // Private methods
     void helper_method();
-    
+
     // Widgets
     QGroupBox *mp_markers_GroupBox;
     QLabel *mp_start_market_Label;

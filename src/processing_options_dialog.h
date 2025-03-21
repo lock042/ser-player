@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #ifndef PROCESSING_OPTIONS_H
 #define PROCESSING_OPTIONS_H
 
@@ -29,7 +28,6 @@ class QGroupBox;
 class QSlider;
 class QSpinBox;
 class c_icon_groupbox;
-
 
 class c_processing_options_dialog : public QDialog
 {
@@ -46,7 +44,6 @@ public:
     double get_colour_saturation();
     bool get_processed_data_is_colour();
 
-
 signals:
     void update_image_req();
     void crop_changed(bool crop_enable, int crop_x, int crop_y, int crop_width, int crop_height);
@@ -61,7 +58,6 @@ signals:
     void enable_area_selection_signal(const QSize &frame_size, const QRect &selected_area);
     void cancel_selected_area_signal();
 
-
 public slots:
     void reset_gain_and_gamma_slot();
     void reset_colour_saturation_slot();
@@ -71,11 +67,7 @@ public slots:
     void crop_selection_complete_slot(bool accepted, QRect selected_area);
     void reject();
 
-
 protected:
-
-
-    
 private slots:
     void crop_changed_slot();
     void debayer_controls_changed_slot();
@@ -99,7 +91,6 @@ private:
     void enable_and_disable_controls();
     void setup_crop_spinboxes();
 
-    
 private:
     //
     // Widgets
@@ -139,7 +130,6 @@ private:
     QSpinBox *mp_crop_y_start_Spinbox;
     QSpinBox *mp_crop_width_Spinbox;
     QSpinBox *mp_crop_height_Spinbox;
-
 
     // Other
     int m_frame_width;

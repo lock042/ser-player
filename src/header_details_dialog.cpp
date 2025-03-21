@@ -15,15 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-#include <Qt>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QTextEdit>
+#include <Qt>
 
-#include "pipp_ser.h"  // colour IDs
 #include "header_details_dialog.h"
+#include "pipp_ser.h" // colour IDs
 #include "pipp_timestamp.h"
-
 
 c_header_details_dialog::c_header_details_dialog(QWidget *parent)
     : QDialog(parent)
@@ -37,32 +36,30 @@ c_header_details_dialog::c_header_details_dialog(QWidget *parent)
     mp_header_details_Tedit->append("No file");
 
     QHBoxLayout *header_details_Hlayout = new QHBoxLayout;
-    header_details_Hlayout->setMargin(0);
+    header_details_Hlayout->setContentsMargins(0, 0, 0, 0);
     header_details_Hlayout->setSpacing(0);
     header_details_Hlayout->addWidget(mp_header_details_Tedit);
-    
+
     setLayout(header_details_Hlayout);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
-
-void c_header_details_dialog::set_details(
-        QString filename,
-        int64_t filesize,
-        QString file_id,
-        int lu_id,
-        int colour_id,
-        int little_endian,
-        int image_width,
-        int image_height,
-        int pixel_depth,
-        int frame_count,
-        QString observer,
-        QString instrument,
-        QString telescope,
-        uint64_t date_time,
-        uint64_t date_time_utc,
-        QString timestamp_info)
+void c_header_details_dialog::set_details(QString filename,
+                                          int64_t filesize,
+                                          QString file_id,
+                                          int lu_id,
+                                          int colour_id,
+                                          int little_endian,
+                                          int image_width,
+                                          int image_height,
+                                          int pixel_depth,
+                                          int frame_count,
+                                          QString observer,
+                                          QString instrument,
+                                          QString telescope,
+                                          uint64_t date_time,
+                                          uint64_t date_time_utc,
+                                          QString timestamp_info)
 {
     QString colour_id_string;
     switch (colour_id) {
@@ -119,57 +116,57 @@ void c_header_details_dialog::set_details(
     mp_header_details_Tedit->append(tr(" * Telescope: %1").arg(telescope));
 
     int32_t ts_year, ts_month, ts_day, ts_hour, ts_minute, ts_second, ts_microsec;
-    c_pipp_timestamp::timestamp_to_date(
-        date_time,
-        &ts_year,
-        &ts_month,
-        &ts_day,
-        &ts_hour,
-        &ts_minute,
-        &ts_second,
-        &ts_microsec);
+    c_pipp_timestamp::timestamp_to_date(date_time,
+                                        &ts_year,
+                                        &ts_month,
+                                        &ts_day,
+                                        &ts_hour,
+                                        &ts_minute,
+                                        &ts_second,
+                                        &ts_microsec);
 
     QString date_time_str = tr("%3/%2/%1 %4:%5:%6.%7")
-                   .arg(ts_year, 4, 10, QLatin1Char( '0' ))
-                   .arg(ts_month, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_day, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_hour, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_minute, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_second, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_microsec, 6, 10, QLatin1Char( '0' )).toUtf8().constData();
+                                .arg(ts_year, 4, 10, QLatin1Char('0'))
+                                .arg(ts_month, 2, 10, QLatin1Char('0'))
+                                .arg(ts_day, 2, 10, QLatin1Char('0'))
+                                .arg(ts_hour, 2, 10, QLatin1Char('0'))
+                                .arg(ts_minute, 2, 10, QLatin1Char('0'))
+                                .arg(ts_second, 2, 10, QLatin1Char('0'))
+                                .arg(ts_microsec, 6, 10, QLatin1Char('0'))
+                                .toUtf8()
+                                .constData();
 
-    c_pipp_timestamp::timestamp_to_date(
-        date_time_utc,
-        &ts_year,
-        &ts_month,
-        &ts_day,
-        &ts_hour,
-        &ts_minute,
-        &ts_second,
-        &ts_microsec);
+    c_pipp_timestamp::timestamp_to_date(date_time_utc,
+                                        &ts_year,
+                                        &ts_month,
+                                        &ts_day,
+                                        &ts_hour,
+                                        &ts_minute,
+                                        &ts_second,
+                                        &ts_microsec);
 
     QString date_time_utc_str = tr("%3/%2/%1 %4:%5:%6.%7")
-                   .arg(ts_year, 4, 10, QLatin1Char( '0' ))
-                   .arg(ts_month, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_day, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_hour, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_minute, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_second, 2, 10, QLatin1Char( '0' ))
-                   .arg(ts_microsec, 6, 10, QLatin1Char( '0' )).toUtf8().constData();
+                                    .arg(ts_year, 4, 10, QLatin1Char('0'))
+                                    .arg(ts_month, 2, 10, QLatin1Char('0'))
+                                    .arg(ts_day, 2, 10, QLatin1Char('0'))
+                                    .arg(ts_hour, 2, 10, QLatin1Char('0'))
+                                    .arg(ts_minute, 2, 10, QLatin1Char('0'))
+                                    .arg(ts_second, 2, 10, QLatin1Char('0'))
+                                    .arg(ts_microsec, 6, 10, QLatin1Char('0'))
+                                    .toUtf8()
+                                    .constData();
 
-    mp_header_details_Tedit->append(tr(" * DateTime: %1 (0x%2)")
-                                    .arg(date_time_str)
-                                    .arg(date_time, 1, 16));
-    mp_header_details_Tedit->append(tr(" * DateTime_UTC: %1 (0x%2)")
-                                    .arg(date_time_utc_str)
-                                    .arg(date_time_utc, 1, 16));
+    mp_header_details_Tedit->append(
+        tr(" * DateTime: %1 (0x%2)").arg(date_time_str).arg(date_time, 1, 16));
+    mp_header_details_Tedit->append(
+        tr(" * DateTime_UTC: %1 (0x%2)").arg(date_time_utc_str).arg(date_time_utc, 1, 16));
     mp_header_details_Tedit->append("");
     mp_header_details_Tedit->append(tr("Timestamps:"));
     mp_header_details_Tedit->append(timestamp_info);
 
     // Resize to fit text
     mp_header_details_Tedit->document()->adjustSize();
-    mp_header_details_Tedit->setFixedSize(mp_header_details_Tedit->document()->size().toSize().width() + 20,
-                                          mp_header_details_Tedit->document()->size().toSize().height() + 20);
-
+    mp_header_details_Tedit
+        ->setFixedSize(mp_header_details_Tedit->document()->size().toSize().width() + 20,
+                       mp_header_details_Tedit->document()->size().toSize().height() + 20);
 }

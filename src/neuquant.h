@@ -19,31 +19,27 @@
  * that this copyright notice remain intact.
  */
 
-
 #include <stdio.h>
-
 
 /* For 256 colours, fixed arrays need 8kb, plus space for the image
    ---------------------------------------------------------------- */
 
-
 /* four primes near 500 - assume no image has a length so large */
 /* that it is divisible by all four primes */
-#define prime1		499
-#define prime2		491
-#define prime3		487
-#define prime4		503
+#define prime1 499
+#define prime2 491
+#define prime3 487
+#define prime4 503
 
-#define minpicturebytes	(3*prime4)		/* minimum size for input image */
-
+#define minpicturebytes (3 * prime4) /* minimum size for input image */
 
 /* Initialise network in range (0,0,0) to (255,255,255) and set parameters
    ----------------------------------------------------------------------- */
 void initnet(unsigned char *thepic, int len, int sample, int number_of_colours);
-		
+
 /* Unbias network to give byte values 0..255 and record position i to prepare for sort
    ----------------------------------------------------------------------------------- */
-void unbiasnet();	/* can edit this function to do output of colour map */
+void unbiasnet(); /* can edit this function to do output of colour map */
 
 /* Output colour map
    ----------------- */
@@ -56,7 +52,7 @@ void inxbuild();
 
 /* Search for BGR values 0..255 (after net is unbiased) and return colour index
    ---------------------------------------------------------------------------- */
-int inxsearch(register int b, register int g, register int r);
+int inxsearch(int b, int g, int r);
 
 /* Main Learning Loop
    ------------------ */

@@ -15,30 +15,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
 #include "gif_write.h"
-#include "pipp_utf8.h"
 #include "lzw_compressor.h"
+#include "pipp_utf8.h"
 
 extern "C" {
-    #include "neuquant.h"
+#include "neuquant.h"
 }
 
 #ifdef QT_BUILD
-    #include <QCoreApplication>
-    #include <QDebug>
+#include <QCoreApplication>
+#include <QDebug>
 #endif
 
-#include <cmath>
 #include <cassert>
+#include <cmath>
 #include <functional>
 #include <memory>
 
-
-c_gif_write::c_gif_write() :
-    m_file_write_error(false),
-    mp_gif_file(nullptr),
-    m_open(false)
+c_gif_write::c_gif_write()
+    : m_file_write_error(false)
+    , mp_gif_file(nullptr)
+    , m_open(false)
 {
     // Header structure fixed fields
     m_gif_header.m_signature[0] = 'G';
@@ -82,7 +80,9 @@ c_gif_write::c_gif_write() :
     m_comment_extension.m_extension_label = 0x21;
     m_comment_extension.m_comment_label = 0xFE;
     m_comment_extension.m_comment_length = sizeof(GIF_COMMENT_STRING) - 1;
-    strncpy((char *)m_comment_extension.m_comment_data, GIF_COMMENT_STRING, sizeof(GIF_COMMENT_STRING) - 1);
+    strncpy((char *) m_comment_extension.m_comment_data,
+            GIF_COMMENT_STRING,
+            sizeof(GIF_COMMENT_STRING) - 1);
     m_comment_extension.m_block_terminator = 0x00;
 #endif
 
@@ -116,27 +116,26 @@ c_gif_write::c_gif_write() :
     m_image_descriptor.m_packed_fields = 0;
 }
 
-
 // ------------------------------------------
 // Create a new GIF file
 // ------------------------------------------
 bool c_gif_write::create(
 #ifdef QT_BUILD
-        const QString &filename,
+    const QString &filename,
 #else
-        const std::string &filename,
+    const std::string &filename,
 #endif
-        int width,
-        int height,
-        int byte_depth,
-        bool colour,
-        int repeat_count,
-        e_colour_quant_type colour_quantisation,
-        int unchanged_border_tolerance,
-        bool use_transparent_pixels,
-        int transparent_tolerence,
-        int lossy_compression_level,
-        int bit_depth)
+    int width,
+    int height,
+    int byte_depth,
+    bool colour,
+    int repeat_count,
+    e_colour_quant_type colour_quantisation,
+    int unchanged_border_tolerance,
+    bool use_transparent_pixels,
+    int transparent_tolerence,
+    int lossy_compression_level,
+    int bit_depth)
 {
     // Check for unsupported arguments and do early return if required
     if (width > 0xFFFF || height > 0xFFFF) {
@@ -189,36 +188,38 @@ bool c_gif_write::create(
     // Return if file did not open
     if (mp_gif_file == nullptr) {
 #ifdef QT_BUILD
-        m_error_string += QCoreApplication::tr("Error: could not open file '%1' for writing", "GIF write file error message")
-            .arg(filename);
+        m_error_string += QCoreApplication::tr("Error: could not open file '%1' for writing",
+                                               "GIF write file error message")
+                              .arg(filename);
         m_error_string += "\n";
 #else
-		m_error_string += "Error: could not open file " + filename + " for writing\n";
+        m_error_string += "Error: could not open file " + filename + " for writing\n";
 #endif
         return true;
     }
 
     // Update header structure variable fields now we have more information
-    m_gif_header.m_logical_screen_width[0] = (uint8_t)(m_width & 0xFF);
-    m_gif_header.m_logical_screen_width[1] = (uint8_t)(m_width >> 8);
-    m_gif_header.m_logical_screen_height[0] = (uint8_t)(m_height & 0xFF);
-    m_gif_header.m_logical_screen_height[1] = (uint8_t)(m_height >> 8);
+    m_gif_header.m_logical_screen_width[0] = (uint8_t) (m_width & 0xFF);
+    m_gif_header.m_logical_screen_width[1] = (uint8_t) (m_width >> 8);
+    m_gif_header.m_logical_screen_height[0] = (uint8_t) (m_height & 0xFF);
+    m_gif_header.m_logical_screen_height[1] = (uint8_t) (m_height >> 8);
 
     if (!m_colour) {
         // Header packed_fields byte for monochrome encoding
-        m_gif_header.m_packed_fields  = 1 << 7;  // Global Color Table Flag
-        m_gif_header.m_packed_fields |= 0x7 << 4;  // Color Resolution: 8-bits per pixel
-        m_gif_header.m_packed_fields |= 0 << 3;  // Sort Flag: Not sorted
-        m_gif_header.m_packed_fields |= (m_bit_depth - 1) << 0;  // Size of Global Color Table: 256 entries
+        m_gif_header.m_packed_fields = 1 << 7;    // Global Color Table Flag
+        m_gif_header.m_packed_fields |= 0x7 << 4; // Color Resolution: 8-bits per pixel
+        m_gif_header.m_packed_fields |= 0 << 3;   // Sort Flag: Not sorted
+        m_gif_header.m_packed_fields |= (m_bit_depth - 1)
+                                        << 0; // Size of Global Color Table: 256 entries
     } else {
         // Header packed fields byte for colour encoding
-        m_gif_header.m_packed_fields  = 0 << 7;  // Global Color Table Flag
-        m_gif_header.m_packed_fields |= 0x7 << 4;  // Color Resolution: 8-bits per pixel
-        m_gif_header.m_packed_fields |= 0 << 3;  // Sort Flag: Not sorted
-        m_gif_header.m_packed_fields |= 0 << 0;  // Size of Global Color Table: Not used
+        m_gif_header.m_packed_fields = 0 << 7;    // Global Color Table Flag
+        m_gif_header.m_packed_fields |= 0x7 << 4; // Color Resolution: 8-bits per pixel
+        m_gif_header.m_packed_fields |= 0 << 3;   // Sort Flag: Not sorted
+        m_gif_header.m_packed_fields |= 0 << 0;   // Size of Global Color Table: Not used
     }
 
-    m_gif_header.m_background_colour_index = 0;  // We do not use background colour pixels as yet
+    m_gif_header.m_background_colour_index = 0; // We do not use background colour pixels as yet
 
     // Write GIF header to the file
     fwrite_error_check(&m_gif_header, 1, sizeof(m_gif_header), mp_gif_file);
@@ -233,9 +234,9 @@ bool c_gif_write::create(
         // Create monochrome LUT
         for (int i = 0; i < colour_table_entries; i++) {
             uint8_t table_value = (i << (8 - m_bit_depth)) | (i >> m_bit_depth);
-            p_global_colour_table[i*3 + 0] = table_value;
-            p_global_colour_table[i*3 + 1] = table_value;
-            p_global_colour_table[i*3 + 2] = table_value;
+            p_global_colour_table[i * 3 + 0] = table_value;
+            p_global_colour_table[i * 3 + 1] = table_value;
+            p_global_colour_table[i * 3 + 2] = table_value;
             p_mono_table[i] = table_value;
         }
 
@@ -285,12 +286,11 @@ bool c_gif_write::create(
             int index = i << 8;
             for (int j = 0; j < (1 << m_bit_depth); j++) {
                 // Calculate difference between colours at indexex i and j
-                int diff = abs((int)p_mono_table[i] - p_mono_table[j]);
+                int diff = abs((int) p_mono_table[i] - p_mono_table[j]);
 
                 // Clip values at 255 and handle case when i == j
-                if (diff > 255 || i == j ||
-                    i >= colour_table_entries || j >= colour_table_entries ||
-                    i == m_transparent_index || j == m_transparent_index) {
+                if (diff > 255 || i == j || i >= colour_table_entries || j >= colour_table_entries
+                    || i == m_transparent_index || j == m_transparent_index) {
                     diff = 255;
                 }
 
@@ -301,8 +301,8 @@ bool c_gif_write::create(
 
     // Update Netscape extension and write to file
     // Netscape extension variable fields
-    m_netscape_extension.m_loop_count[0] = (uint8_t)(repeat_count & 0xFF);
-    m_netscape_extension.m_loop_count[1] = (uint8_t)(repeat_count >> 8);
+    m_netscape_extension.m_loop_count[0] = (uint8_t) (repeat_count & 0xFF);
+    m_netscape_extension.m_loop_count[1] = (uint8_t) (repeat_count >> 8);
     fwrite_error_check(&m_netscape_extension, 1, sizeof(m_netscape_extension), mp_gif_file);
 
     if (m_file_write_error) {
@@ -317,13 +317,10 @@ bool c_gif_write::create(
     return ret;
 }
 
-
 // ------------------------------------------
 // Write frame to GIF file
 // ------------------------------------------
-bool c_gif_write::write_frame(
-        uint8_t *p_data,
-        uint16_t display_time)
+bool c_gif_write::write_frame(uint8_t *p_data, uint16_t display_time)
 {
     // Early return checks
     if (mp_gif_file == nullptr) {
@@ -343,21 +340,20 @@ bool c_gif_write::write_frame(
     // Scan top/bottom lines and left/right columns to check for lines/columns identical to previous frame
     // These areas do not need to be encoded.
     uint16_t x_start = 0;
-    uint16_t x_end = m_width-1;
+    uint16_t x_end = m_width - 1;
     uint16_t y_start = 0;
-    uint16_t y_end = m_height-1;
+    uint16_t y_end = m_height - 1;
 
     bool first_frame_and_not_transparent = false;
 
     if (!m_colour) {
         // Monochorome data
-        detect_unchanged_border(
-            p_data,  // const uint8_t *p_this_image
-            mp_last_image.get(),  //const uint8_t *p_last_image
-            x_start,  // uint16_t &x_start
-            x_end,  // uint16_t &x_end
-            y_start,  // uint16_t &y_start
-            y_end);  // uint16_t &y_end
+        detect_unchanged_border(p_data,              // const uint8_t *p_this_image
+                                mp_last_image.get(), //const uint8_t *p_last_image
+                                x_start,             // uint16_t &x_start
+                                x_end,               // uint16_t &x_end
+                                y_start,             // uint16_t &y_start
+                                y_end);              // uint16_t &y_end
 
         // Buffer to keep image data for processing the next frame
         bool first_frame = false;
@@ -376,7 +372,7 @@ bool c_gif_write::write_frame(
             int x = x_start;
             uint8_t *p_current_data = p_data + (y * m_width + x);
             uint8_t *p_last_data = mp_last_image.get() + (y * m_width + x);
-            for ( ; x <= x_end; x++) {
+            for (; x <= x_end; x++) {
                 if (m_use_transparent_pixels && !first_frame) {
                     uint8_t mono = *p_current_data++;
                     int diff = abs(mono - *p_last_data);
@@ -395,7 +391,7 @@ bool c_gif_write::write_frame(
                         // Update last image pixel for comparison with the next frame
                         *p_last_data++ = mono;
                     }
-                } else {  // Not using transparent pixels or first frame
+                } else { // Not using transparent pixels or first frame
                     uint8_t mono = *p_current_data++;
 
                     // Write indexed data to buffer ready for compression
@@ -408,13 +404,12 @@ bool c_gif_write::write_frame(
         }
     } else {
         // Colour data
-        detect_unchanged_border(
-            p_data,  // const uint8_t *p_this_image
-            mp_last_image.get(),  //const uint8_t *p_last_image
-            x_start,  // uint16_t &x_start
-            x_end,  // uint16_t &x_end
-            y_start,  // uint16_t &y_start
-            y_end);  // uint16_t &y_end
+        detect_unchanged_border(p_data,              // const uint8_t *p_this_image
+                                mp_last_image.get(), //const uint8_t *p_last_image
+                                x_start,             // uint16_t &x_start
+                                x_end,               // uint16_t &x_end
+                                y_start,             // uint16_t &y_start
+                                y_end);              // uint16_t &y_end
 
         int num_colours = 1 << m_bit_depth;
         bool first_frame = false;
@@ -438,26 +433,26 @@ bool c_gif_write::write_frame(
         std::unique_ptr<uint8_t[]> p_rev_colour_table(new uint8_t[1 << (3 * 6)]);
 
         if (m_colour_quant_type == COLOUR_QUANT_TYPE_NEUQUANT) {
-            quantise_colours_neuquant(
-                p_data,  // uint8_t *p_data
-//                x_start,  // uint16_t x_start,
-//                x_end,  // uint16_t x_end,
-//                y_start,  // uint16_t y_start,
-//                y_end,  // uint16_t y_end,
-                num_colours,  // int number_of_colours
-                p_colour_table.get(),
-                mp_index_to_index_colour_difference_lut.get()); // uint8_t *p_index_to_index_colour_difference
+            quantise_colours_neuquant(p_data,      // uint8_t *p_data
+                                                   //                x_start,  // uint16_t x_start,
+                                                   //                x_end,  // uint16_t x_end,
+                                                   //                y_start,  // uint16_t y_start,
+                                                   //                y_end,  // uint16_t y_end,
+                                      num_colours, // int number_of_colours
+                                      p_colour_table.get(),
+                                      mp_index_to_index_colour_difference_lut
+                                          .get()); // uint8_t *p_index_to_index_colour_difference
         } else {
-            quantise_colours_median_cut(
-                p_data,  // uint8_t *p_data
-                x_start,  // uint16_t x_start,
-                x_end,  // uint16_t x_end,
-                y_start,  // uint16_t y_start,
-                y_end,  // uint16_t y_end,
-                num_colours,  // int number_of_colours
-                p_colour_table.get(),
-                p_rev_colour_table.get(),
-                mp_index_to_index_colour_difference_lut.get()); // uint8_t *p_index_to_index_colour_difference
+            quantise_colours_median_cut(p_data,      // uint8_t *p_data
+                                        x_start,     // uint16_t x_start,
+                                        x_end,       // uint16_t x_end,
+                                        y_start,     // uint16_t y_start,
+                                        y_end,       // uint16_t y_end,
+                                        num_colours, // int number_of_colours
+                                        p_colour_table.get(),
+                                        p_rev_colour_table.get(),
+                                        mp_index_to_index_colour_difference_lut
+                                            .get()); // uint8_t *p_index_to_index_colour_difference
         }
 
         // Buffer to keep image data for processing the next frame
@@ -471,7 +466,10 @@ bool c_gif_write::write_frame(
         //
         // Create a buffer for the index image
         uint8_t *p_write_data = p_index_image.get();
-        uint8_t(c_gif_write::*p_get_best_index)(uint8_t b, uint8_t g, uint8_t r, uint8_t *p_rev_colour_table);
+        uint8_t (c_gif_write::*p_get_best_index)(uint8_t b,
+                                                 uint8_t g,
+                                                 uint8_t r,
+                                                 uint8_t *p_rev_colour_table);
         if (m_colour_quant_type == COLOUR_QUANT_TYPE_NEUQUANT) {
             p_get_best_index = &c_gif_write::get_best_index_neuquant;
         } else {
@@ -482,7 +480,7 @@ bool c_gif_write::write_frame(
             int x = x_start;
             uint8_t *p_current_data = p_data + (y * m_width + x) * 3;
             uint8_t *p_last_data = mp_last_image.get() + (y * m_width + x) * 3;
-            for ( ; x <= x_end; x++) {
+            for (; x <= x_end; x++) {
                 if (m_use_transparent_pixels && !first_frame) {
                     uint8_t b = *p_current_data++;
                     int b_diff = abs(b - (*p_last_data++));
@@ -495,7 +493,10 @@ bool c_gif_write::write_frame(
                     not_transparent |= r_diff > m_transparent_tolerence;
                     if (not_transparent) {
                         // This pixel is not transparent
-                        *p_write_data++ = (this->*p_get_best_index)(b, g, r, p_rev_colour_table.get());
+                        *p_write_data++ = (this->*p_get_best_index)(b,
+                                                                    g,
+                                                                    r,
+                                                                    p_rev_colour_table.get());
 
                         // Update last image pixel for comparison with the next frame
                         *(p_last_data - 3) = b;
@@ -506,7 +507,7 @@ bool c_gif_write::write_frame(
                         *p_write_data++ = m_transparent_index;
                         // Note that the last image pixel value is left unchanged
                     }
-                } else {  // Not using transparent pixels or first frame
+                } else { // Not using transparent pixels or first frame
                     uint8_t b = *p_current_data++;
                     uint8_t g = *p_current_data++;
                     uint8_t r = *p_current_data++;
@@ -525,49 +526,54 @@ bool c_gif_write::write_frame(
         p_rev_colour_table.reset(nullptr);
     }
 
-//    printf("Active area: (%d, %d) - (%d, %d)\n", x_start, x_end, y_start, y_end);
+    //    printf("Active area: (%d, %d) - (%d, %d)\n", x_start, x_end, y_start, y_end);
 
     // Update graphic control extension structure variables fields
-    m_graphic_control_extension.m_packed_field  = 0 << 2;  // Disposal method: None specified
-    m_graphic_control_extension.m_packed_field |= 0 << 1;  // User Input Flag: No user input expected
+    m_graphic_control_extension.m_packed_field = 0 << 2;  // Disposal method: None specified
+    m_graphic_control_extension.m_packed_field |= 0 << 1; // User Input Flag: No user input expected
 
     //if (m_use_transparent_pixels && mp_last_image.get() != nullptr) {
     if (m_use_transparent_pixels && !first_frame_and_not_transparent) {
-        m_graphic_control_extension.m_packed_field |= 1 << 0;  // Transparent colour flag
+        m_graphic_control_extension.m_packed_field |= 1 << 0; // Transparent colour flag
     }
 
     m_graphic_control_extension.m_delay_time[0] = display_time & 0xFF;
     m_graphic_control_extension.m_delay_time[1] = display_time >> 8;
-    m_graphic_control_extension.m_transparent_colour_index = (uint8_t)m_transparent_index;
+    m_graphic_control_extension.m_transparent_colour_index = (uint8_t) m_transparent_index;
 
     // Write graphic control extension to the file
-    fwrite_error_check(&m_graphic_control_extension, 1, sizeof(m_graphic_control_extension), mp_gif_file);
+    fwrite_error_check(&m_graphic_control_extension,
+                       1,
+                       sizeof(m_graphic_control_extension),
+                       mp_gif_file);
 
     // Update image descriptor structure variable fields
-    m_image_descriptor.m_image_left_position[0] = (uint8_t)(x_start & 0xFF);
-    m_image_descriptor.m_image_left_position[1] = (uint8_t)(x_start >> 8);
-    m_image_descriptor.m_image_top_position[0] = (uint8_t)(y_start & 0xFF);
-    m_image_descriptor.m_image_top_position[1] = (uint8_t)(y_start >> 8);
+    m_image_descriptor.m_image_left_position[0] = (uint8_t) (x_start & 0xFF);
+    m_image_descriptor.m_image_left_position[1] = (uint8_t) (x_start >> 8);
+    m_image_descriptor.m_image_top_position[0] = (uint8_t) (y_start & 0xFF);
+    m_image_descriptor.m_image_top_position[1] = (uint8_t) (y_start >> 8);
     uint16_t active_width = 1 + x_end - x_start;
-    m_image_descriptor.m_image_width[0] = (uint8_t)(active_width & 0xFF);
-    m_image_descriptor.m_image_width[1] = (uint8_t)(active_width >> 8);
+    m_image_descriptor.m_image_width[0] = (uint8_t) (active_width & 0xFF);
+    m_image_descriptor.m_image_width[1] = (uint8_t) (active_width >> 8);
     uint16_t active_height = 1 + y_end - y_start;
-    m_image_descriptor.m_image_height[0] = (uint8_t)(active_height & 0xFF);
-    m_image_descriptor.m_image_height[1] = (uint8_t)(active_height >> 8);
+    m_image_descriptor.m_image_height[0] = (uint8_t) (active_height & 0xFF);
+    m_image_descriptor.m_image_height[1] = (uint8_t) (active_height >> 8);
     if (!m_colour) {
         // Monochrome data
         // Image descriptor packed fields byte for monochrome encoding
-        m_image_descriptor.m_packed_fields  = 0 << 7;  // Local Color Table Flag - No local colour table for monochrome
-        m_image_descriptor.m_packed_fields |= 0 << 6;  // Interlace flag - No interlacing
-        m_image_descriptor.m_packed_fields |= 0 << 5;  // Sort flag - Colour table is not sorted
-        m_image_descriptor.m_packed_fields |= 0 << 0;  // Size of local colour table
+        m_image_descriptor.m_packed_fields
+            = 0 << 7; // Local Color Table Flag - No local colour table for monochrome
+        m_image_descriptor.m_packed_fields |= 0 << 6; // Interlace flag - No interlacing
+        m_image_descriptor.m_packed_fields |= 0 << 5; // Sort flag - Colour table is not sorted
+        m_image_descriptor.m_packed_fields |= 0 << 0; // Size of local colour table
     } else {
         // Colour data
         // Image descriptor packed fields byte for colour encoding
-        m_image_descriptor.m_packed_fields  = 1 << 7;  // Local Color Table Flag - Use local colour table for colour
-        m_image_descriptor.m_packed_fields |= 0 << 6;  // Interlace flag - No interlacing
-        m_image_descriptor.m_packed_fields |= 0 << 5;  // Sort flag - Colour table is not sorted
-        m_image_descriptor.m_packed_fields |= (m_bit_depth-1) << 0;  // Size of local colour table
+        m_image_descriptor.m_packed_fields
+            = 1 << 7; // Local Color Table Flag - Use local colour table for colour
+        m_image_descriptor.m_packed_fields |= 0 << 6; // Interlace flag - No interlacing
+        m_image_descriptor.m_packed_fields |= 0 << 5; // Sort flag - Colour table is not sorted
+        m_image_descriptor.m_packed_fields |= (m_bit_depth - 1) << 0; // Size of local colour table
     }
 
     // Write image descriptor to the file
@@ -585,22 +591,20 @@ bool c_gif_write::write_frame(
     fwrite_error_check(&m_bit_depth, 1, 1, mp_gif_file);
 
     // Compress image data and write to file
-    c_lzw_compressor lzw_compressor(
-        x_end - x_start + 1,  // m_width,
-        y_end - y_start + 1,  // m_height
-        0,  // x_start,
-        x_end - x_start,  // x_end,
-        0,  // y_start,
-        y_end - y_start,  // y_end,
-        m_bit_depth,
-        p_index_image.get());
-
+    c_lzw_compressor lzw_compressor(x_end - x_start + 1, // m_width,
+                                    y_end - y_start + 1, // m_height
+                                    0,                   // x_start,
+                                    x_end - x_start,     // x_end,
+                                    0,                   // y_start,
+                                    y_end - y_start,     // y_end,
+                                    m_bit_depth,
+                                    p_index_image.get());
 
     // Set details of lossy compression
-    lzw_compressor.set_lossy_details(
-        m_lossy_compression_level,  // int lossy_compression_level
-        mp_index_to_index_colour_difference_lut.get(),  // p_index_to_index_colour_difference_lut
-        m_transparent_index);  // int transparent_index
+    lzw_compressor.set_lossy_details(m_lossy_compression_level, // int lossy_compression_level
+                                     mp_index_to_index_colour_difference_lut
+                                         .get(),           // p_index_to_index_colour_difference_lut
+                                     m_transparent_index); // int transparent_index
 
     bool all_compressed = false;
     while (!all_compressed) {
@@ -620,7 +624,6 @@ bool c_gif_write::write_frame(
         mp_index_to_index_colour_difference_lut.reset(nullptr);
     }
 
-
     // Write block terminator to file
     char null_term = 0;
     fwrite_error_check(&null_term, 1, 1, mp_gif_file);
@@ -637,7 +640,6 @@ bool c_gif_write::write_frame(
     return ret;
 }
 
-
 // ------------------------------------------
 // Finish and close GIF file
 // ------------------------------------------
@@ -652,25 +654,24 @@ uint64_t c_gif_write::close()
 
     if (mp_gif_file != nullptr) {
         // Write comment block out if defined
-    #ifdef GIF_COMMENT_STRING
+#ifdef GIF_COMMENT_STRING
         fwrite_error_check(&m_comment_extension, 1, sizeof(m_comment_extension), mp_gif_file);
-    #endif
+#endif
 
         // Write file terminator to file
         char file_terminator = 0x3B;
         fwrite_error_check(&file_terminator, 1, 1, mp_gif_file);
 
-        filesize = ftell64(mp_gif_file);  // Get final file size
+        filesize = ftell64(mp_gif_file); // Get final file size
 
         // Close the file
-        fclose(mp_gif_file);  // Close file
+        fclose(mp_gif_file); // Close file
         mp_gif_file = nullptr;
     }
 
     m_open = false;
     return filesize;
 }
-
 
 // ------------------------------------------
 // Get the current filesize
@@ -685,17 +686,12 @@ uint64_t c_gif_write::get_current_filesize()
     return filesize;
 }
 
-
 // ------------------------------------------
 // fwrite() function with error checking
 // ------------------------------------------
-void c_gif_write::fwrite_error_check(
-    const void *ptr,
-    size_t size,
-    size_t count,
-    FILE *p_stream)
+void c_gif_write::fwrite_error_check(const void *ptr, size_t size, size_t count, FILE *p_stream)
 {
-    if (!m_file_write_error) {  // Do not continue writing after an error has occured
+    if (!m_file_write_error) { // Do not continue writing after an error has occured
         size_t size_written = fwrite(ptr, size, count, p_stream);
         if (size_written != count) {
             m_file_write_error = true;
@@ -703,21 +699,19 @@ void c_gif_write::fwrite_error_check(
     }
 }
 
-
-void c_gif_write::quantise_colours_median_cut(
-        uint8_t *p_data,
-        uint16_t x_start,
-        uint16_t x_end,
-        uint16_t y_start,
-        uint16_t y_end,
-        int number_of_colours,
-        uint8_t *p_colour_table,
-        uint8_t *p_rev_colour_table,
-        uint8_t *p_index_to_index_colour_difference_lut)
+void c_gif_write::quantise_colours_median_cut(uint8_t *p_data,
+                                              uint16_t x_start,
+                                              uint16_t x_end,
+                                              uint16_t y_start,
+                                              uint16_t y_end,
+                                              int number_of_colours,
+                                              uint8_t *p_colour_table,
+                                              uint8_t *p_rev_colour_table,
+                                              uint8_t *p_index_to_index_colour_difference_lut)
 {
-    assert (p_data != nullptr);
-    assert (p_colour_table != nullptr);
-    assert (p_rev_colour_table != nullptr);
+    assert(p_data != nullptr);
+    assert(p_colour_table != nullptr);
+    assert(p_rev_colour_table != nullptr);
 
     std::unique_ptr<uint32_t[]> p_histogram_lut(new uint32_t[1 << 18]());
     std::unique_ptr<uint32_t[]> p_index_lut(new uint32_t[1 << 18]);
@@ -730,7 +724,7 @@ void c_gif_write::quantise_colours_median_cut(
     for (int y = y_start; y <= y_end; y++) {
         int x = x_start;
         uint8_t *p_data_ptr = p_data + (y * m_width + x) * 3;
-        for ( ; x <= x_end; x++) {
+        for (; x <= x_end; x++) {
             uint8_t b = (*p_data_ptr++) >> 2;
             uint8_t g = (*p_data_ptr++) >> 2;
             uint8_t r = (*p_data_ptr++) >> 2;
@@ -755,14 +749,14 @@ void c_gif_write::quantise_colours_median_cut(
     do {
         did_swap = false;
         for (int i = 0; i < number_of_hist_entries - 1; i++) {
-            if (p_histogram_lut[i] < p_histogram_lut[i+1]) {
+            if (p_histogram_lut[i] < p_histogram_lut[i + 1]) {
                 uint32_t temp = p_histogram_lut[i];
-                p_histogram_lut[i] = p_histogram_lut[i+1];
-                p_histogram_lut[i+1] = temp;
+                p_histogram_lut[i] = p_histogram_lut[i + 1];
+                p_histogram_lut[i + 1] = temp;
 
                 temp = p_index_lut[i];
-                p_index_lut[i] = p_index_lut[i+1];
-                p_index_lut[i+1] = temp;
+                p_index_lut[i] = p_index_lut[i + 1];
+                p_index_lut[i + 1] = temp;
                 did_swap = true;
             }
         }
@@ -831,10 +825,10 @@ void c_gif_write::quantise_colours_median_cut(
             if (remaining_hist_entries > free_palette_colours) {
                 // There are more remaining histogram entries than there are remaining palette entries
                 // Look for close colours to combine to reduce the number of colours
-                for ( ; palette_entry < number_of_palette_colours; palette_entry++) {
-                    int diff = abs((int)r - p_colour_r_palette[palette_entry]);
-                    diff += abs((int)g - p_colour_g_palette[palette_entry]);
-                    diff += abs((int)b - p_colour_b_palette[palette_entry]);
+                for (; palette_entry < number_of_palette_colours; palette_entry++) {
+                    int diff = abs((int) r - p_colour_r_palette[palette_entry]);
+                    diff += abs((int) g - p_colour_g_palette[palette_entry]);
+                    diff += abs((int) b - p_colour_b_palette[palette_entry]);
 
                     if (diff <= 4) {
                         // Close enough colour found in colour palette
@@ -847,8 +841,8 @@ void c_gif_write::quantise_colours_median_cut(
             if (colour_found) {
                 // There was a similar colour already in the colour palette
                 // Update the colour to index LUT for this colour
-                p_rev_colour_table[r << 12 | g << 6 | b] = (uint8_t)palette_entry;
-                colour_found_count++;  // debug
+                p_rev_colour_table[r << 12 | g << 6 | b] = (uint8_t) palette_entry;
+                colour_found_count++; // debug
             } else {
                 // No similar colour was found in the colour palette
                 // Add this colour to the colour palette
@@ -857,7 +851,7 @@ void c_gif_write::quantise_colours_median_cut(
                 p_colour_b_palette[number_of_palette_colours] = b;
 
                 // Also update the colour to index LUT for this colour
-                p_rev_colour_table[r << 12 | g << 6 | b] = (uint8_t)number_of_palette_colours;
+                p_rev_colour_table[r << 12 | g << 6 | b] = (uint8_t) number_of_palette_colours;
 
                 // Increase palette colour count
                 number_of_palette_colours++;
@@ -892,7 +886,7 @@ void c_gif_write::quantise_colours_median_cut(
     // We have now filled the colour palette but need to find the closest values in the
     // colour palette for the remaining values in the histogram LUT to add to the
     // colour to index LUT
-    for ( ; hist_entry < number_of_hist_entries; hist_entry++) {
+    for (; hist_entry < number_of_hist_entries; hist_entry++) {
         // Extract RGB values from index table
         uint32_t temp = p_index_lut[hist_entry];
         uint8_t b = temp & 0x3F;
@@ -905,9 +899,9 @@ void c_gif_write::quantise_colours_median_cut(
         int best_diff = 0xFF;
         int best_entry = 0;
         for (int palette_entry = 0; palette_entry < number_of_palette_colours; palette_entry++) {
-            int diff = abs((int)r - p_colour_r_palette[palette_entry]);
-            diff += abs((int)g - p_colour_g_palette[palette_entry]);
-            diff += abs((int)b - p_colour_b_palette[palette_entry]);
+            int diff = abs((int) r - p_colour_r_palette[palette_entry]);
+            diff += abs((int) g - p_colour_g_palette[palette_entry]);
+            diff += abs((int) b - p_colour_b_palette[palette_entry]);
 
             if (diff < best_diff) {
                 best_diff = diff;
@@ -916,7 +910,7 @@ void c_gif_write::quantise_colours_median_cut(
         }
 
         // Update the colour to index LUT for this colour
-        p_rev_colour_table[r << 12 | g << 6 | b] = (uint8_t)best_entry;
+        p_rev_colour_table[r << 12 | g << 6 | b] = (uint8_t) best_entry;
     }
 
     // Delete index table as it has done its job in creating the colour palette and reverse colour palettes
@@ -933,11 +927,10 @@ void c_gif_write::quantise_colours_median_cut(
         r_top_2_bits >>= 4;
         g_top_2_bits >>= 4;
         b_top_2_bits >>= 4;
-        *p_colour_table_entry++ = (int)(p_colour_r_palette[palette_entry] << 2) | r_top_2_bits;
-        *p_colour_table_entry++ = (int)(p_colour_g_palette[palette_entry] << 2) | g_top_2_bits;
-        *p_colour_table_entry++ = (int)(p_colour_b_palette[palette_entry] << 2) | b_top_2_bits;
+        *p_colour_table_entry++ = (int) (p_colour_r_palette[palette_entry] << 2) | r_top_2_bits;
+        *p_colour_table_entry++ = (int) (p_colour_g_palette[palette_entry] << 2) | g_top_2_bits;
+        *p_colour_table_entry++ = (int) (p_colour_b_palette[palette_entry] << 2) | b_top_2_bits;
     }
-
 
     // Create index to index colour difference table if required
     // This is used by the lossy compression code
@@ -946,12 +939,13 @@ void c_gif_write::quantise_colours_median_cut(
             int index = i << 8;
             for (int j = 0; j < (1 << m_bit_depth); j++) {
                 // Calculate difference between colours at indexex i and j
-                int diff = abs((int)p_colour_r_palette[i] - p_colour_r_palette[j]);
-                diff += abs((int)p_colour_g_palette[i] - p_colour_g_palette[j]);
-                diff += abs((int)p_colour_b_palette[i] - p_colour_b_palette[j]);
+                int diff = abs((int) p_colour_r_palette[i] - p_colour_r_palette[j]);
+                diff += abs((int) p_colour_g_palette[i] - p_colour_g_palette[j]);
+                diff += abs((int) p_colour_b_palette[i] - p_colour_b_palette[j]);
 
                 // Clip values at 255 and handle case when i == j
-                if (diff > 255 || i == j || i >= number_of_palette_colours || j >= number_of_palette_colours) {
+                if (diff > 255 || i == j || i >= number_of_palette_colours
+                    || j >= number_of_palette_colours) {
                     diff = 255;
                 }
 
@@ -961,32 +955,31 @@ void c_gif_write::quantise_colours_median_cut(
     }
 }
 
-
-uint8_t c_gif_write::get_best_index_median_cut(uint8_t b, uint8_t g, uint8_t r, uint8_t *p_rev_colour_table)
+uint8_t c_gif_write::get_best_index_median_cut(uint8_t b,
+                                               uint8_t g,
+                                               uint8_t r,
+                                               uint8_t *p_rev_colour_table)
 {
     return p_rev_colour_table[(r >> 2) << 12 | (g >> 2) << 6 | (b >> 2)];
 }
 
-
-void c_gif_write::quantise_colours_neuquant(
-    uint8_t *p_data,
-//    uint16_t x_start,
-//    uint16_t x_end,
-//    uint16_t y_start,
-//    uint16_t y_end,
-    int number_of_colours,
-    uint8_t *p_colour_table,
-    uint8_t *p_index_to_index_colour_difference_lut)
+void c_gif_write::quantise_colours_neuquant(uint8_t *p_data,
+                                            //    uint16_t x_start,
+                                            //    uint16_t x_end,
+                                            //    uint16_t y_start,
+                                            //    uint16_t y_end,
+                                            int number_of_colours,
+                                            uint8_t *p_colour_table,
+                                            uint8_t *p_index_to_index_colour_difference_lut)
 {
     assert(p_data != nullptr);
     assert(p_colour_table != nullptr);
 
     uint8_t *p_image_data = p_data;
     uint8_t *p_temp_buffer = nullptr;
-    int width = m_width;// x_end - x_start + 1;
-    int height = m_height;// y_end - y_start + 1;
-    if (false)
-    {
+    int width = m_width;   // x_end - x_start + 1;
+    int height = m_height; // y_end - y_start + 1;
+    if (false) {
         // Test code for reducing colours
         // Create temp buffer
         width /= 2;
@@ -996,8 +989,7 @@ void c_gif_write::quantise_colours_neuquant(
         uint8_t *p_write_ptr = p_temp_buffer;
         for (int y = 0; y < height; y++) {
             uint8_t *p_read_ptr = p_data + 3 * y * m_width * 2;
-            for (int x = 0; x < width; x++)
-            {
+            for (int x = 0; x < width; x++) {
                 int temp;
                 temp = *p_read_ptr;
                 temp += *(p_read_ptr + 3);
@@ -1024,7 +1016,7 @@ void c_gif_write::quantise_colours_neuquant(
                 p_read_ptr += 4;
             }
         }
-/*
+        /*
         FILE *fp = fopen("D:\\temp\\temp.ppm", "wb"); // b - binary mode
         fprintf(fp, "P6\n%d %d\n255\n", width, height);
         uint8_t *p_read_ptr = p_temp_buffer;
@@ -1039,65 +1031,67 @@ void c_gif_write::quantise_colours_neuquant(
         fclose(fp);
 */
     }
-         
+
     const int samplefac = 1;
-    initnet(p_image_data, 3 * width*height, samplefac, number_of_colours);
+    initnet(p_image_data, 3 * width * height, samplefac, number_of_colours);
     learn();
     unbiasnet();
     writecolourmap(p_colour_table);
     inxbuild();
 
-    delete[] p_temp_buffer;  // Delete temp buffer if one was used
+    delete[] p_temp_buffer; // Delete temp buffer if one was used
 
     // Create index to index colour difference table if required
     // This is used by the lossy compression code
     if (p_index_to_index_colour_difference_lut != nullptr) {
         for (int i = 0; i < ((1 << m_bit_depth) * 3); i += 3) {
-            int index = (i/3) << 8;
+            int index = (i / 3) << 8;
             for (int j = 0; j < ((1 << m_bit_depth) * 3); j += 3) {
                 // Calculate difference between colours at indexex i and j
-                int diff = abs((int)p_colour_table[i+0] - p_colour_table[j+0]);
-                diff += abs((int)p_colour_table[i+1] - p_colour_table[j+1]);
-                diff += abs((int)p_colour_table[i+2] - p_colour_table[j+2]);
+                int diff = abs((int) p_colour_table[i + 0] - p_colour_table[j + 0]);
+                diff += abs((int) p_colour_table[i + 1] - p_colour_table[j + 1]);
+                diff += abs((int) p_colour_table[i + 2] - p_colour_table[j + 2]);
 
                 // Clip values at 255 and handle case when i == j
                 if (diff > 255 || i == j || i >= number_of_colours || j >= number_of_colours) {
                     diff = 255;
                 }
 
-                p_index_to_index_colour_difference_lut[index | (j/3)] = diff;
+                p_index_to_index_colour_difference_lut[index | (j / 3)] = diff;
             }
         }
     }
 }
 
-uint8_t c_gif_write::get_best_index_neuquant(uint8_t b, uint8_t g, uint8_t r, uint8_t *p_rev_colour_table)
+uint8_t c_gif_write::get_best_index_neuquant(uint8_t b,
+                                             uint8_t g,
+                                             uint8_t r,
+                                             uint8_t *p_rev_colour_table)
 {
-    (void)p_rev_colour_table;  // Remove unused arg compiler warning
+    (void) p_rev_colour_table; // Remove unused arg compiler warning
     return inxsearch(b, g, r);
 }
 
-
-void c_gif_write::detect_unchanged_border(
-            const uint8_t *p_this_image,
-            const uint8_t *p_last_image,
-            uint16_t &x_start,
-            uint16_t &x_end,
-            uint16_t &y_start,
-            uint16_t &y_end)
+void c_gif_write::detect_unchanged_border(const uint8_t *p_this_image,
+                                          const uint8_t *p_last_image,
+                                          uint16_t &x_start,
+                                          uint16_t &x_end,
+                                          uint16_t &y_start,
+                                          uint16_t &y_end)
 {
     assert(p_this_image != nullptr);
 
     if (!m_colour) {
         // Monochome version of the code
-        if (p_last_image != nullptr) {  // p_last_image == nullptr for first frame
+        if (p_last_image != nullptr) { // p_last_image == nullptr for first frame
             const uint8_t *p_last_data = p_last_image;
             const uint8_t *p_current_data = p_this_image;
             // Scan top lines
             bool mismatch = false;
             for (y_start = 0; y_start <= y_end; y_start++) {
                 for (int x = 0; x < m_width; x++) {
-                    mismatch |= abs((int)(*p_current_data++) - (*p_last_data++)) > m_unchanged_border_tolerance;
+                    mismatch |= abs((int) (*p_current_data++) - (*p_last_data++))
+                                > m_unchanged_border_tolerance;
                 }
 
                 // Break out of loop on mismatch
@@ -1116,11 +1110,12 @@ void c_gif_write::detect_unchanged_border(
             } else {
                 // Scan bottom lines
                 mismatch = false;
-                for ( ; y_end > y_start; y_end--) {
+                for (; y_end > y_start; y_end--) {
                     p_last_data = p_last_image + y_end * m_width;
                     p_current_data = p_this_image + y_end * m_width;
                     for (int x = 0; x < m_width; x++) {
-                        mismatch |= abs((int)(*p_current_data++) - (*p_last_data++)) > m_unchanged_border_tolerance;
+                        mismatch |= abs((int) (*p_current_data++) - (*p_last_data++))
+                                    > m_unchanged_border_tolerance;
                     }
 
                     // Break out of look on mismatch
@@ -1135,7 +1130,8 @@ void c_gif_write::detect_unchanged_border(
                     p_last_data = p_last_image + y_start * m_width + x_start;
                     p_current_data = p_this_image + y_start * m_width + x_start;
                     for (int y = y_start; y <= y_end; y++) {
-                        mismatch |= abs((int)(*p_current_data) - (*p_last_data)) > m_unchanged_border_tolerance;
+                        mismatch |= abs((int) (*p_current_data) - (*p_last_data))
+                                    > m_unchanged_border_tolerance;
                         p_current_data += m_width;
                         p_last_data += m_width;
                     }
@@ -1152,7 +1148,8 @@ void c_gif_write::detect_unchanged_border(
                     p_last_data = p_last_image + y_start * m_width + x_end;
                     p_current_data = p_this_image + y_start * m_width + x_end;
                     for (int y = y_start; y <= y_end; y++) {
-                        mismatch |= abs((int)(*p_current_data) - (*p_last_data)) > m_unchanged_border_tolerance;
+                        mismatch |= abs((int) (*p_current_data) - (*p_last_data))
+                                    > m_unchanged_border_tolerance;
                         p_current_data += m_width;
                         p_last_data += m_width;
                     }
@@ -1176,9 +1173,9 @@ void c_gif_write::detect_unchanged_border(
             bool mismatch = false;
             for (y_start = 0; y_start <= y_end; y_start++) {
                 for (int x = 0; x < m_width; x++) {
-                    int diff = abs((int)(*p_current_data++) - (*p_last_data++));
-                    diff += abs((int)(*p_current_data++) - (*p_last_data++));
-                    diff += abs((int)(*p_current_data++) - (*p_last_data++));
+                    int diff = abs((int) (*p_current_data++) - (*p_last_data++));
+                    diff += abs((int) (*p_current_data++) - (*p_last_data++));
+                    diff += abs((int) (*p_current_data++) - (*p_last_data++));
                     mismatch |= diff > m_unchanged_border_tolerance;
                 }
 
@@ -1198,13 +1195,13 @@ void c_gif_write::detect_unchanged_border(
             } else {
                 // Scan bottom lines
                 mismatch = false;
-                for ( ; y_end > y_start; y_end--) {
+                for (; y_end > y_start; y_end--) {
                     p_last_data = p_last_image + y_end * m_width * 3;
                     p_current_data = p_this_image + y_end * m_width * 3;
                     for (int x = 0; x < m_width; x++) {
-                        int diff = abs((int)(*p_current_data++) - (*p_last_data++));
-                        diff += abs((int)(*p_current_data++) - (*p_last_data++));
-                        diff += abs((int)(*p_current_data++) - (*p_last_data++));
+                        int diff = abs((int) (*p_current_data++) - (*p_last_data++));
+                        diff += abs((int) (*p_current_data++) - (*p_last_data++));
+                        diff += abs((int) (*p_current_data++) - (*p_last_data++));
                         mismatch |= diff > m_unchanged_border_tolerance;
                     }
 
@@ -1221,9 +1218,9 @@ void c_gif_write::detect_unchanged_border(
                     p_last_data = p_last_image + (y_start * m_width + x_start) * 3;
                     p_current_data = p_this_image + (y_start * m_width + x_start) * 3;
                     for (int y = y_start; y <= y_end; y++) {
-                        int diff = abs((int)(*p_current_data++) - (*p_last_data++));
-                        diff += abs((int)(*p_current_data++) - (*p_last_data++));
-                        diff += abs((int)(*p_current_data) - (*p_last_data));
+                        int diff = abs((int) (*p_current_data++) - (*p_last_data++));
+                        diff += abs((int) (*p_current_data++) - (*p_last_data++));
+                        diff += abs((int) (*p_current_data) - (*p_last_data));
                         mismatch |= diff > m_unchanged_border_tolerance;
                         p_current_data += pixel_in_line_minus_2;
                         p_last_data += pixel_in_line_minus_2;
@@ -1241,9 +1238,9 @@ void c_gif_write::detect_unchanged_border(
                     p_last_data = p_last_image + (y_start * m_width + x_end) * 3;
                     p_current_data = p_this_image + (y_start * m_width + x_end) * 3;
                     for (int y = y_start; y <= y_end; y++) {
-                        int diff = abs((int)(*p_current_data++) - (*p_last_data++));
-                        diff += abs((int)(*p_current_data++) - (*p_last_data++));
-                        diff += abs((int)(*p_current_data) - (*p_last_data));
+                        int diff = abs((int) (*p_current_data++) - (*p_last_data++));
+                        diff += abs((int) (*p_current_data++) - (*p_last_data++));
+                        diff += abs((int) (*p_current_data) - (*p_last_data));
                         mismatch |= diff > m_unchanged_border_tolerance;
                         p_current_data += pixel_in_line_minus_2;
                         p_last_data += pixel_in_line_minus_2;
@@ -1261,4 +1258,3 @@ void c_gif_write::detect_unchanged_border(
     // At this point x_start, x_end, y_start and y_end should be updated to allow for
     // an unchanged border for this frame
 }
-

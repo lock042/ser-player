@@ -15,13 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 // ---------------------------------------------------------------------
 
-
-#include "ser_player.h"
 #include "application.h"
+#include "ser_player.h"
 
 #include <QDebug>
 #include <QStyle>
-
 
 int main(int argc, char *argv[])
 {
