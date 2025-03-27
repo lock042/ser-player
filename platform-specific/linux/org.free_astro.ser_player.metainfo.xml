@@ -8,6 +8,24 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
 
+  <content_rating type="oars-1.1"/>
+
+  <developer id="org.free_astro">
+    	<name>Cyril Richard</name>
+  </developer>
+
+  <url type="homepage">https://free-astro.org/index.php?title=SER_Player</url>
+  <screenshots>
+        <screenshot type="default">
+            <caption>Main window</caption>
+            <image>https://nouspiro.space/upload/serplayer1.png</image>
+        </screenshot>
+        <screenshot type="default">
+            <caption></caption>
+            <image>https://nouspiro.space/upload/serplayer2.png</image>
+        </screenshot>
+    </screenshots>
+
   <description>
     <p>
       A simple video player for playing SER files used for solar, lunar and planetary astronomy-imaging.
@@ -18,4 +36,15 @@
   </description>
 
   <launchable type="desktop-id">org.free_astro.ser_player.desktop</launchable>
+
+  <releases>
+    <release version="1.8.0" date="2025-03-21">
+      <description>
+        <ul>
+          <li>Migrated the project to a new maintainer, Cyril Richard, who continues development.</li>
+          <li>Updated the application to use Qt6, ensuring compatibility with modern operating systems.</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
 </component>
