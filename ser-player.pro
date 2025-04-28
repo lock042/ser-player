@@ -350,30 +350,33 @@ unix:!macx {
     target.path = $$PREFIX/bin
 
     icon256.path = $$PREFIX/share/icons/hicolor/256x256/apps
-    icon256.files = platform-specific/linux/icons/256x256/ser-player.png
+    icon256.files = platform-specific/linux/icons/256x256/org.free_astro.ser_player.png
     
     icon128.path = $$PREFIX/share/icons/hicolor/128x128/apps
-    icon128.files = platform-specific/linux/icons/128x128/ser-player.png
+    icon128.files = platform-specific/linux/icons/128x128/org.free_astro.ser_player.png
 
     icon48.path = $$PREFIX/share/icons/hicolor/48x48/apps
-    icon48.files = platform-specific/linux/icons/48x48/ser-player.png
+    icon48.files = platform-specific/linux/icons/48x48/org.free_astro.ser_player.png
 
     icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps
-    icon32.files = platform-specific/linux/icons/32x32/ser-player.png
+    icon32.files = platform-specific/linux/icons/32x32/org.free_astro.ser_player.png
 
     icon24.path = $$PREFIX/share/icons/hicolor/24x24/apps
-    icon24.files = platform-specific/linux/icons/24x24/ser-player.png
+    icon24.files = platform-specific/linux/icons/24x24/org.free_astro.ser_player.png
 
     icon16.path = $$PREFIX/share/icons/hicolor/16x16/apps
-    icon16.files = platform-specific/linux/icons/16x16/ser-player.png
+    icon16.files = platform-specific/linux/icons/16x16/org.free_astro.ser_player.png
 
     mimexml.path = $$PREFIX/share/mime/packages
-    mimexml.files = platform-specific/linux/ser-player.xml
+    mimexml.files = platform-specific/linux/org.free_astro.ser_player.xml
 
     desktop.path = $$PREFIX/share/applications/
-    desktop.files = platform-specific/linux/com.google.sites.ser-player.desktop
+    desktop.files = platform-specific/linux/org.free_astro.ser_player.desktop
 
-    INSTALLS = target  icon256 icon128 icon48 icon32 icon24 icon16 mimexml desktop
+    metainfo.path = $$PREFIX/share/metainfo/
+    metainfo.files = platform-specific/linux/org.free_astro.ser_player.metainfo.xml
+
+    INSTALLS = target  icon256 icon128 icon48 icon32 icon24 icon16 mimexml desktop metainfo
 
     defined(BUILD_FOR_REPOSITORY, var) {
         message("Not generating targets to register icons and mime type because building for Repository")
